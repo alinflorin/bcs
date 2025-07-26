@@ -1,0 +1,422 @@
+name: Main
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  MAJOR_MINOR: "1.0"
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.version.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Important for fetching tags
+
+      - name: Calculate version
+        id: version
+        run: |
+          MAJOR_MINOR=${{ env.MAJOR_MINOR }}
+
+          LAST_TAG=$(git tag --list "v$MAJOR_MINOR.*" --sort=-v:refname | head -n1)
+          if [[ -z "$LAST_TAG" ]]; then
+            PATCH=0
+          else
+            LAST_PATCH=${LAST_TAG##*.}
+            PATCH=$((LAST_PATCH + 1))
+          fi
+
+          VERSION="$MAJOR_MINOR.$PATCH"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_ENV  # Export for use in other jobs
+          echo "Calculated version: $VERSION"
+
+
+  rename-run:
+    needs: version
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Update the summary
+        run: |
+          VERSION="${{ needs.version.outputs.VERSION }}"
+          PR_TITLE=""
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            PR_TITLE="PR: ${{ github.event.pull_request.title }}"
+          fi
+
+          SUMMARY="Version: $VERSION"
+          if [ -n "$PR_TITLE" ]; then
+            SUMMARY="$PR_TITLE - $SUMMARY"
+          fi
+
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+
+  analyze:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    name: Analyze (${{ matrix.language }})
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - language: actions
+          build-mode: none
+        - language: javascript-typescript
+          build-mode: none
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: ${{ matrix.build-mode }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
+
+
+  docker-build-app:
+    needs: [version]
+    env:
+      VERSION: ${{ needs.version.outputs.VERSION }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runs-on: ubuntu-latest
+          - platform: linux/arm64
+            runs-on: ubuntu-24.04-arm
+
+    runs-on: ${{ matrix.runs-on }}
+
+    steps:
+      - name: Prepare
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+
+      - name: Login to GHCR (only on main)
+        uses: docker/login-action@v3
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Inject version into app version.ts
+        run: |
+          echo "export const version = '${VERSION}';" > ./src/app/src/version.ts
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Build
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src/app
+          push: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+          platforms: ${{ matrix.platform }}
+          tags: ghcr.io/alinflorin/bcs-app
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Export digest
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-digests-${{ env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+
+  docker-merge-app:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    needs:
+      - docker-build-app
+      - version
+    env:
+      VERSION: ${{ needs.version.outputs.VERSION }}
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: app-digests-*
+          merge-multiple: true
+
+      - name: Login to GHCR (only on main)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create \
+            -t ghcr.io/alinflorin/bcs-app:${{ env.VERSION }} -t ghcr.io/alinflorin/bcs-app:latest \
+            $(printf 'ghcr.io/alinflorin/bcs-app@sha256:%s ' *)
+
+
+  docker-build-api:
+    needs: [version]
+    env:
+      VERSION: ${{ needs.version.outputs.VERSION }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runs-on: ubuntu-latest
+          - platform: linux/arm64
+            runs-on: ubuntu-24.04-arm
+
+    runs-on: ${{ matrix.runs-on }}
+
+    steps:
+      - name: Prepare
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+
+      - name: Login to GHCR (only on main)
+        uses: docker/login-action@v3
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Build
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src/api
+          push: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+          platforms: ${{ matrix.platform }}
+          tags: ghcr.io/alinflorin/bcs-api
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Export digest
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-digests-${{ env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  docker-merge-api:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    needs:
+      - docker-build-api
+      - version
+    env:
+      VERSION: ${{ needs.version.outputs.VERSION }}
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: api-digests-*
+          merge-multiple: true
+
+      - name: Login to GHCR (only on main)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create \
+            -t ghcr.io/alinflorin/bcs-api:${{ env.VERSION }} -t ghcr.io/alinflorin/bcs-api:latest \
+            $(printf 'ghcr.io/alinflorin/bcs-api@sha256:%s ' *)
+
+  helm:
+    runs-on: ubuntu-latest
+    needs: [version]
+    env:
+      VERSION: ${{ needs.version.outputs.VERSION }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract and bump version
+        id: version
+        run: |
+          sed -i "s/^version:.*/version: $VERSION/" chart/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: \"$VERSION\"/" chart/Chart.yaml
+
+      - name: Log in to GHCR for Helm
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
+
+      - name: Cache Helm dependencies
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: chart/charts
+          key: ${{ runner.os }}-helm-deps-${{ hashFiles('chart/Chart.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-helm-deps-
+
+      - name: Add Helm repos
+        working-directory: chart
+        run: |
+          if [ -f "./Chart.lock" ]; then
+            yq --indent 0 '.dependencies | map(["helm", "repo", "add", .name, .repository] | join(" ")) | .[]' "./Chart.lock"  | sh --;
+          fi
+
+      - name: Download dependencies for Helm chart
+        working-directory: chart
+        if: ${{ steps.cache.outputs.cache-hit != true }}
+        run: |
+          helm dependency build
+
+      - name: Package Helm chart
+        working-directory: chart
+        run: |
+          helm package .
+
+      - name: Push Helm chart to GHCR
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        working-directory: chart
+        run: |
+          helm push bcs-*.tgz oci://ghcr.io/alinflorin/charts
+
+  set-version:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [version, docker-merge-app, docker-merge-api, helm]
+    env:
+      VERSION: ${{ needs.version.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Git tag
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git tag v${{ env.VERSION }}
+          git push origin v${{ env.VERSION }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [docker-merge-app, docker-merge-api, helm, version, set-version]
+    env:
+      VERSION: ${{ needs.version.outputs.VERSION }}
+    strategy:
+      matrix:
+        environment: [stg, uat, prd]
+
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+
+    environment:
+      name: ${{ matrix.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Write Kubeconfig to file
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+
+      - name: Substitute Secrets Action
+        uses: faradaytrs/substitute-secrets-action@2.1
+        with:
+          input: "chart/values-${{ matrix.environment }}.yaml"
+          substitutionRegex: \$\{([A-Z0-9_]+)\}
+          substitutionData: ${{ toJSON(secrets) }}
+          throwOnDataMissing: false
+
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
+          use-cache: "true"
+          tags: tag:mobile
+          version: latest
+
+      - name: Log in to GHCR for Helm
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
+
+      - name: Deploy to ${{ matrix.environment }} environment with Helm
+        run: |
+          helm upgrade --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --install --namespace bcs-${{ matrix.environment }} --create-namespace --values chart/values-${{ matrix.environment }}.yaml --version=${{ env.VERSION }} bcs oci://ghcr.io/alinflorin/charts/bcs
+
+      - name: Remove kubeconfig file
+        if: always()
+        run: rm -rf ${{ github.workspace }}/kubeconfig.yaml || true
