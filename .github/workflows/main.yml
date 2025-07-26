@@ -236,7 +236,7 @@ jobs:
 
       - name: Deploy to ${{ matrix.environment }} environment with Helm
         run: |
-          helm upgrade --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --install --namespace bcs-${{ matrix.environment }} --create-namespace --values chart/values-${{ matrix.environment }}.yaml --version ${{ env.VERSION }} bcs oci://ghcr.io/alinflorin/charts/bcs
+          helm upgrade --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --install --namespace bcs-${{ matrix.environment }} --create-namespace --values src/chart/values-${{ matrix.environment }}.yaml --version ${{ env.VERSION }} bcs oci://ghcr.io/alinflorin/charts/bcs
 
       - name: Remove kubeconfig file
         if: always()
