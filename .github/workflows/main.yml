@@ -43,7 +43,6 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV  # Export for use in other jobs
           echo "Calculated version: $VERSION"
 
-
   rename-run:
     needs: version
     runs-on: ubuntu-latest
@@ -98,7 +97,6 @@ jobs:
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
-
 
   docker-build-app:
     needs: [version]
@@ -167,7 +165,6 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-
   docker-merge-app:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -200,7 +197,6 @@ jobs:
           docker buildx imagetools create \
             -t ghcr.io/alinflorin/bcs-app:${{ env.VERSION }} -t ghcr.io/alinflorin/bcs-app:latest \
             $(printf 'ghcr.io/alinflorin/bcs-app@sha256:%s ' *)
-
 
   docker-build-api:
     needs: [version]
