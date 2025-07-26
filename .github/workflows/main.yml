@@ -83,7 +83,7 @@ jobs:
         - language: javascript-typescript
           build-mode: none
         - language: csharp
-          build-mode: auto
+          build-mode: autobuild
 
     steps:
     - name: Checkout repository
