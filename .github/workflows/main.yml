@@ -124,8 +124,8 @@ jobs:
       - name: Extract and bump version
         id: version
         run: |
-          sed -i "s/^version:.*/version: $VERSION/" chart/Chart.yaml
-          sed -i "s/^appVersion:.*/appVersion: \"$VERSION\"/" chart/Chart.yaml
+          sed -i "s/^version:.*/version: $VERSION/" src/chart/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: \"$VERSION\"/" src/chart/Chart.yaml
 
       - name: Log in to GHCR for Helm
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -136,32 +136,32 @@ jobs:
         uses: actions/cache@v3
         id: cache
         with:
-          path: chart/charts
-          key: ${{ runner.os }}-helm-deps-${{ hashFiles('chart/Chart.lock') }}
+          path: src/chart/charts
+          key: ${{ runner.os }}-helm-deps-${{ hashFiles('src/chart/Chart.lock') }}
           restore-keys: |
             ${{ runner.os }}-helm-deps-
 
       - name: Add Helm repos
-        working-directory: chart
+        working-directory: src/chart
         run: |
           if [ -f "./Chart.lock" ]; then
             yq --indent 0 '.dependencies | map(["helm", "repo", "add", .name, .repository] | join(" ")) | .[]' "./Chart.lock"  | sh --;
           fi
 
       - name: Download dependencies for Helm chart
-        working-directory: chart
+        working-directory: src/chart
         if: ${{ steps.cache.outputs.cache-hit != true }}
         run: |
           helm dependency build
 
       - name: Package Helm chart
-        working-directory: chart
+        working-directory: src/chart
         run: |
           helm package .
 
       - name: Push Helm chart to GHCR
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        working-directory: chart
+        working-directory: src/chart
         run: |
           helm push bcs-*.tgz oci://ghcr.io/alinflorin/charts
 

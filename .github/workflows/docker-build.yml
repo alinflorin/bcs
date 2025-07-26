@@ -54,7 +54,7 @@ jobs:
           context: ${{ inputs.path }}
           push: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
           platforms: ${{ matrix.platform }}
-          tags: ghcr.io/alinflorin/${{ inputs.version }}
+          tags: ghcr.io/alinflorin/${{ inputs.name }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
