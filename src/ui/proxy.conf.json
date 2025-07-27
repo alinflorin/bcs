@@ -1,3 +1,9 @@
 {
-  "/api": "http://localhost:5000"
+  "/api": "http://localhost:5000",
+  "/signalr": {
+    "target": "http://localhost:5000",
+    "ws": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
 }
