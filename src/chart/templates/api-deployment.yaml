@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: bcs-api
-          image: ghcr.io/alinflorin/bcs-api:{{ .Release.AppVersion }}
+          image: ghcr.io/alinflorin/bcs-api:{{ .Chart.AppVersion }}
           resources:
             requests:
               memory: "512Mi"
