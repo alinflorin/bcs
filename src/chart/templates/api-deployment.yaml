@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bcs-api
+spec:
+  selector:
+    matchLabels:
+      app: bcs-api
+  template:
+    metadata:
+      labels:
+        app: bcs-api
+    spec:
+      containers:
+        - name: bcs-api
+          image: ghcr.io/alinflorin/bcs-api:{{ .Release.AppVersion }}
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          ports:
+            - containerPort: 80
