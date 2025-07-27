@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dotnet watch run",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["watch", "run"],
+      "isBackground": true,
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
