@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, Input, signal, WritableSignal } from '@angular/core';
 import { version } from '../../../version';
 
 @Component({
@@ -9,4 +9,6 @@ import { version } from '../../../version';
 })
 export class Footer {
   version = signal(version);
+
+  @Input() apiVersion!: WritableSignal<string>;
 }
