@@ -1,6 +1,1 @@
-namespace Bcs.Api;
-
-public class Version
-{
-    public static string Value = "local";
-}
+namespace Bcs.Api; public class Version { public const string Value = "local";}

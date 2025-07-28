@@ -58,6 +58,8 @@ jobs:
           outputs: type=image,push-by-digest=true,name-canonical=true,push=${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ inputs.version }}
 
       - name: Export digest
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
