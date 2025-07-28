@@ -27,8 +27,10 @@ export class Header {
   translate = inject(TranslateService);
   @Input() user: UserClaims | undefined;
   allLanguages = config.languages;
+  @Input() theme = 'auto';
 
   @Output() onLanguageChanged = new EventEmitter<string>();
+  @Output() onThemeChanged = new EventEmitter<string>();
   @Output() onLoginClicked = new EventEmitter<void>();
   @Output() onLogoutClicked = new EventEmitter<void>();
 }

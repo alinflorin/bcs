@@ -22,6 +22,8 @@ export class App implements OnInit {
 
   user = signal<UserClaims | undefined>(undefined);
 
+  theme = signal('auto');
+
   ngOnInit(): void {
     // Auth
     this.oidcSecurityService.checkAuth().subscribe(r => {
@@ -37,12 +39,45 @@ export class App implements OnInit {
     this.translate.addLangs(config.languages.map(x => x.code));
     this.translate.setDefaultLang(config.defaultLanguage);
     this.translate.use(localStorage.getItem('lang') || this.translate.getBrowserLang() || config.defaultLanguage);
+
+    // Theme
+    const theme = localStorage.getItem('theme');
+    if (theme) {
+      this.theme.set(theme);
+      if (theme === 'dark') {
+        this.enableDarkMode();
+      } else {
+        this.disableDarkMode();
+      }
+    }
   }
 
   changeLanguage(newLang: string): void {
     this.translate.use(newLang).subscribe(() => {
       localStorage.setItem('lang', newLang);
     });
+  }
+
+  changeTheme(newTheme: string): void {
+    this.theme.set(newTheme);
+    if (newTheme === 'auto') {
+      localStorage.removeItem('theme');
+      this.disableDarkMode();
+      return;
+    }
+    localStorage.setItem('theme', newTheme);
+    if (newTheme === 'dark') {
+      this.enableDarkMode();
+    } else {
+      this.disableDarkMode();
+    }
+  }
+
+  private enableDarkMode() {
+    document.querySelector('body')!.className = "dark-mode";
+  }
+  private disableDarkMode() {
+    document.querySelector('body')!.className = "";
   }
 
   login() {

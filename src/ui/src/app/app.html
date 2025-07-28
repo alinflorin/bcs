@@ -4,6 +4,8 @@
     (onLoginClicked)="login()"
     (onLogoutClicked)="logout()"
     [user]="user()"
+    [theme]="theme()"
+    (onThemeChanged)="changeTheme($event)"
   ></app-header>
   <div id="content">
     <router-outlet />

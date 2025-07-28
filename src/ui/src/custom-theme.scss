@@ -7,6 +7,10 @@
 @use '@angular/material' as mat;
 
 
+@mixin apply-dark-mode {
+  color-scheme: dark;
+}
+
 html {
   @include mat.theme((
     color: (
@@ -20,7 +24,7 @@ html {
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the
   // user's system settings.
-  color-scheme: light;
+  color-scheme: light dark;
 
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
@@ -28,4 +32,10 @@ html {
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
+}
+
+body {
+  &.dark-mode {
+    @include apply-dark-mode;
+  }
 }

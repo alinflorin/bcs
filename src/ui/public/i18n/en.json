@@ -6,7 +6,13 @@
         "language": "Language",
         "login": "Login",
         "logout": "Logout",
-        "settings": "Settings"
+        "settings": "Settings",
+        "theme": "Theme",
+        "themes": {
+          "auto": "Auto",
+          "light": "Light",
+          "dark": "Dark"
+        }
       }
     }
   }

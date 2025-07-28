@@ -29,6 +29,9 @@
     <button mat-menu-item [matMenuTriggerFor]="languageMenu">
       {{ "ui.layout.header.language" | translate }}
     </button>
+    <button mat-menu-item [matMenuTriggerFor]="themeMenu">
+      {{ "ui.layout.header.theme" | translate }}
+    </button>
     <button routerLink="/about" mat-menu-item>
       {{ "ui.layout.header.about" | translate }}
     </button>
@@ -56,5 +59,31 @@
       <span>{{ l.name }}</span>
     </button>
     }
+  </mat-menu>
+  <mat-menu #themeMenu="matMenu">
+    <button (click)="onThemeChanged.emit('auto')" mat-menu-item>
+      @if(theme === 'auto') {
+        <mat-icon>check</mat-icon>
+      } @else {
+        <mat-icon></mat-icon>
+      }
+      <span>{{ "ui.layout.header.themes.auto" | translate }}</span>
+    </button>
+    <button (click)="onThemeChanged.emit('light')" mat-menu-item>
+      @if(theme === 'light') {
+        <mat-icon>check</mat-icon>
+      } @else {
+        <mat-icon></mat-icon>
+      }
+      <span>{{ "ui.layout.header.themes.light" | translate }}</span>
+    </button>
+    <button (click)="onThemeChanged.emit('dark')" mat-menu-item>
+      @if(theme === 'dark') {
+        <mat-icon>check</mat-icon>
+      } @else {
+        <mat-icon></mat-icon>
+      }
+      <span>{{ "ui.layout.header.themes.dark" | translate }}</span>
+    </button>
   </mat-menu>
 </mat-toolbar>

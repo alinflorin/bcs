@@ -6,7 +6,13 @@
         "language": "Limbă",
         "login": "Login",
         "logout": "Logout",
-        "settings": "Setări"
+        "settings": "Setări",
+        "theme": "Temă",
+        "themes": {
+          "auto": "Auto",
+          "light": "Luminos",
+          "dark": "Întunecat"
+        }
       }
     }
   }
