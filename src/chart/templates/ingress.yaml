@@ -12,11 +12,12 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
     nginx.ingress.kubernetes.io/upgrade: "websocket"
 
-    # 🔒 Rate limiting annotations
-    nginx.ingress.kubernetes.io/limit-connections: "1"
-    nginx.ingress.kubernetes.io/limit-rpm: "50"
+    nginx.ingress.kubernetes.io/limit-rps: "20"                      # 10 requests per second
+    nginx.ingress.kubernetes.io/limit-burst: "40"                    # optional: allows short bursts
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "1"
-    nginx.ingress.kubernetes.io/limit-rate-after: "0"
+    nginx.ingress.kubernetes.io/limit-rate-after: "0"                # apply immediately
+    # nginx.ingress.kubernetes.io/limit-connections: "1"               # optional: limit concurrent connections
+
 spec:
   tls:
     - hosts:
