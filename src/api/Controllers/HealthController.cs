@@ -1,8 +1,10 @@
 using Bcs.Api.Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bcs.Api.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [Route("api/[controller]")]
 public class HealthController(ILogger<HealthController> logger) : ControllerBase
