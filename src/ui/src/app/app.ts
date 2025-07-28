@@ -6,6 +6,7 @@ import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { ApiService } from './services/api.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UserClaims } from './models/user-claims';
+import { config } from './config';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +20,7 @@ export class App implements OnInit {
   private readonly translate = inject(TranslateService);
   apiVersion = signal('?');
 
-  user = signal<UserClaims | null>(null);
+  user = signal<UserClaims | undefined>(undefined);
 
   ngOnInit(): void {
     // Auth
@@ -33,9 +34,9 @@ export class App implements OnInit {
     });
 
     // Translate
-    this.translate.addLangs(['ro', 'en']);
-    this.translate.setDefaultLang('en');
-    this.translate.use(localStorage.getItem('lang') || this.translate.getBrowserLang() || 'en');
+    this.translate.addLangs(config.languages.map(x => x.code));
+    this.translate.setDefaultLang(config.defaultLanguage);
+    this.translate.use(localStorage.getItem('lang') || this.translate.getBrowserLang() || config.defaultLanguage);
   }
 
   changeLanguage(newLang: string): void {

@@ -1,5 +1,10 @@
 <div id="wrapper">
-  <app-header [user]="user()"></app-header>
+  <app-header
+    (onLanguageChanged)="changeLanguage($event)"
+    (onLoginClicked)="login()"
+    (onLogoutClicked)="logout()"
+    [user]="user()"
+  ></app-header>
   <div id="content">
     <router-outlet />
   </div>

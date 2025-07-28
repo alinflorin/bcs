@@ -1,3 +1,13 @@
 {
-
+  "ui": {
+    "layout": {
+      "header": {
+        "about": "Despre",
+        "language": "Limbă",
+        "login": "Login",
+        "logout": "Logout",
+        "settings": "Setări"
+      }
+    }
+  }
 }

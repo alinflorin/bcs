@@ -3,6 +3,6 @@ export interface UserClaims {
   email: string;
   email_verified: boolean;
   name: string;
-  nickname?: string;
-  picture?: string;
+  nickname?: string | undefined;
+  picture?: string | undefined;
 }

@@ -21,3 +21,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   -moz-font-feature-settings: 'liga';
   -moz-osx-font-smoothing: grayscale;
 }
+
+.wbba {
+  word-break: break-all;
+}
+
+.cp {
+  cursor: pointer;
+}

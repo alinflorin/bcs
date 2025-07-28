@@ -1,3 +1,13 @@
 {
-
+  "ui": {
+    "layout": {
+      "header": {
+        "about": "About",
+        "language": "Language",
+        "login": "Login",
+        "logout": "Logout",
+        "settings": "Settings"
+      }
+    }
+  }
 }
