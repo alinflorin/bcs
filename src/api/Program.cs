@@ -1,8 +1,9 @@
 
-using System.Security.Claims;
+using Bcs.Api.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace Bcs.Api;
 
@@ -55,14 +56,30 @@ public class Program
 
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
+        builder.Services.AddOpenApi(options =>
+        {
+            options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+        });
 
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            app.MapOpenApi();
+            app.MapOpenApi("/api/openapi/v1.json").CacheOutput();
+
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/api/openapi/v1.json", "v1");
+                options.RoutePrefix = "api/swagger";
+                options.OAuthClientId(app.Configuration["Oidc:ClientId"]);
+                options.OAuthAdditionalQueryStringParams(new Dictionary<string, string>
+                {
+                    { "audience", app.Configuration["Oidc:Audience"] }
+                });
+                options.OAuthUsePkce();
+                options.OAuthAppName("BCS API");
+            });
         }
 
         app.UseAuthentication();
