@@ -30,6 +30,7 @@
     "@angular/router": "^20.1.0",
     "@fontsource/material-icons": "^5.2.5",
     "@fontsource/roboto": "^5.2.6",
+    "angular-auth-oidc-client": "19.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
