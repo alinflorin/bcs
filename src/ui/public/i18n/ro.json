@@ -14,6 +14,15 @@
           "dark": "Întunecat"
         }
       }
+    },
+    "routes": {
+      "oauth-callback": {
+        "loading": "Se încarcă"
+      },
+      "not-found": {
+        "notFound": "Negăsit",
+        "goHome": "Navighează acasă"
+      }
     }
   }
 }

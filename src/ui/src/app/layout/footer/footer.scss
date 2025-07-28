@@ -1,0 +1,18 @@
+.footer {
+  height: 36px;
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 0.75rem;
+  line-height: 36px;
+  justify-content: center;
+
+  .footer-text {
+    width: 100%;
+    text-align: center;
+    opacity: 0.85;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

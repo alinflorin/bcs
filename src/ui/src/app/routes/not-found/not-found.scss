@@ -1,0 +1,28 @@
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+
+  .icon {
+    margin-bottom: 2rem;
+    color: var(--mat-sys-error);
+  }
+
+  h1 {
+    font-size: 5rem;
+    margin: 0;
+  }
+
+  p {
+    font-size: 1.2rem;
+    margin: 2rem 0 2rem;
+    color: var(--mat-mdc-color-on-surface, #666);
+  }
+
+  button {
+    font-weight: 500;
+  }
+}
