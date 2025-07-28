@@ -1,7 +1,7 @@
 <div id="wrapper">
-  <app-header></app-header>
+  <app-header [user]="user()"></app-header>
   <div id="content">
     <router-outlet />
   </div>
-  <app-footer [apiVersion]="apiVersion"></app-footer>
+  <app-footer [apiVersion]="apiVersion()"></app-footer>
 </div>

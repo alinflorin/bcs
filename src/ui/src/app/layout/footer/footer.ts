@@ -10,5 +10,5 @@ import { version } from '../../../version';
 export class Footer {
   version = signal(version);
 
-  @Input() apiVersion!: WritableSignal<string>;
+  @Input() apiVersion!: string;
 }

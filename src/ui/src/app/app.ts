@@ -5,6 +5,7 @@ import { Footer } from './layout/footer/footer';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { ApiService } from './services/api.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { UserClaims } from './models/user-claims';
 
 @Component({
   selector: 'app-root',
@@ -18,9 +19,13 @@ export class App implements OnInit {
   private readonly translate = inject(TranslateService);
   apiVersion = signal('?');
 
+  user = signal<UserClaims | null>(null);
+
   ngOnInit(): void {
     // Auth
-    this.oidcSecurityService.checkAuth().subscribe();
+    this.oidcSecurityService.checkAuth().subscribe(r => {
+      this.user.set(r.userData);
+    });
 
     // Get API version
     this.apiService.getApiVersion().subscribe(r => {
