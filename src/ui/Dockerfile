@@ -5,6 +5,7 @@ COPY ./package.json ./package.json
 COPY ./package-lock.json ./package-lock.json
 RUN npm ci
 COPY . .
+RUN echo "export const version = '$VERSION';" > ./src/version.ts
 RUN npm run build
 # Install brotli and gzip utilities
 RUN apk add --no-cache brotli gzip
