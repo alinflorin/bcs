@@ -1,3 +1,7 @@
 environment: uat
 ingress:
   domain: bcs-uat.internal.huna2.com
+
+secrets:
+  qdrantReadWriteApiKey: '${QDRANT_READ_WRITE_API_KEY}'
+  qdrantReadOnlyApiKey: '${QDRANT_READ_ONLY_API_KEY}'

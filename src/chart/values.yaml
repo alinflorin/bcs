@@ -22,3 +22,37 @@ ingress:
     nginx.ingress.kubernetes.io/limit-burst: "40"                    # optional: allows short bursts
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "1"
     nginx.ingress.kubernetes.io/limit-rate-after: "0"                # apply immediately
+
+qdrant:
+  enabled: true
+  config:
+    cluster:
+      enabled: false
+      p2p:
+        port: 6335
+        enable_tls: false
+      consensus:
+        tick_period_ms: 100
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  persistence:
+    size: 5Gi
+  apiKey:
+    valueFrom:
+      secretKeyRef:
+        name: bcs
+        key: apiKeyReadWrite
+  readOnlyApiKey:
+    valueFrom:
+      secretKeyRef:
+        name: bcs
+        key: apiKeyReadOnly
+
+secrets:
+  qdrantReadWriteApiKey: null
+  qdrantReadOnlyApiKey: null

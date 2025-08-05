@@ -4,5 +4,6 @@ namespace Bcs.Api.Dto
     {
         public bool Healthy { get; set; }
         public string Version { get; set; }
+        public string Reason { get; set; }
     }
 }

@@ -23,7 +23,10 @@ version: 1.0.0
 # It is recommended to use it with quotes.
 appVersion: "1.0.0"
 
-# dependencies:
+dependencies:
+  - name: qdrant
+    version: "1.15.1"
+    repository: "https://qdrant.github.io/qdrant-helm"
 # - name: mongodb
 #   version: "0.7.1"
 #   repository: "https://groundhog2k.github.io/helm-charts/"
