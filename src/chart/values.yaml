@@ -1,4 +1,5 @@
-environment: prd
+environment: null
+
 ui:
   resources:
     requests:
@@ -7,6 +8,7 @@ ui:
     limits:
       memory: "1Gi"
       cpu: "1000m"
+
 api:
   resources:
     requests:
@@ -15,8 +17,9 @@ api:
     limits:
       memory: "2Gi"
       cpu: "1000m"
+
 ingress:
-  domain: bcs.internal.huna2.com
+  domain: null
   extraAnnotations:
     nginx.ingress.kubernetes.io/limit-rps: "20"                      # 10 requests per second
     nginx.ingress.kubernetes.io/limit-burst: "40"                    # optional: allows short bursts

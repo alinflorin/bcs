@@ -1,4 +1,5 @@
 environment: stg
+
 ingress:
   domain: bcs-stg.internal.huna2.com
 
