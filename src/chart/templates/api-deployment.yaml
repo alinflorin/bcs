@@ -25,6 +25,8 @@ spec:
                 secretKeyRef:
                   name: bcs
                   key: apiKeyReadOnly
+            - name: 'QDRANT__HOSTNAME'
+              value: '{{ .Release.Name }}-qdrant'
           livenessProbe:
             httpGet:
               path: /api/health
