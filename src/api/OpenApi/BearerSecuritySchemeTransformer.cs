@@ -36,7 +36,7 @@ namespace Bcs.Api.OpenApi
                                     ["profile"] = "Profile scope",
                                     ["email"] = "Email scope",
                                     ["offline_access"] = "RT",
-                                    ["api:all"] = "API scope"
+                                    ["api:admin"] = "API admin scope"
                                 },
                                 RefreshUrl = new Uri(config["Oidc:Authority"] + "/oauth/token"),
                                 TokenUrl = new Uri(config["Oidc:Authority"] + "/oauth/token"),
@@ -59,7 +59,7 @@ namespace Bcs.Api.OpenApi
                                 Id = "Bearer"
                             }
                         },
-                        new[] { "openid", "profile", "email", "offline_access", "api:all" }
+                        new[] { "openid", "profile", "email", "offline_access", "api:admin" }
                     }
                 });
             }

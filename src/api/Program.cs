@@ -44,16 +44,20 @@ public class Program
 
         builder.Services.AddAuthorization(options =>
         {
-            var policy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+            var requireAuthPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthenticatedUser()
+                .Build();
+            var requireAdminPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
                 .RequireAuthenticatedUser()
                 .RequireAssertion(context =>
                 {
-                    var scopeClaim = context.User.FindFirst("scope")?.Value;
-                    return scopeClaim?.Split(' ').Contains("api:all") == true;
+                    var permissions = context.User.FindAll("permissions");
+                    return permissions.Any(p => p.Value == "api:admin");
                 })
                 .Build();
-            options.AddPolicy("RequireApiScope", policy);
-            options.DefaultPolicy = policy;
+            options.AddPolicy("RequireAuth", requireAuthPolicy);
+            options.AddPolicy("RequireAdmin", requireAdminPolicy);
+            options.DefaultPolicy = requireAuthPolicy;
         });
 
         builder.Services.AddControllers();
@@ -104,7 +108,7 @@ public class Program
         app.UseAuthorization();
 
 
-        app.MapControllers().RequireAuthorization("RequireApiScope");
+        app.MapControllers().RequireAuthorization("RequireAuth");
 
         app.Run();
     }

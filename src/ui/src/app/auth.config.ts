@@ -6,7 +6,7 @@ export const authConfig: PassedInitialConfig = {
             redirectUrl: window.location.origin + '/callback',
             postLogoutRedirectUri: window.location.origin,
             clientId: 'ZykKITiL8eKwjhHwVCRqnNUtM3RkXTQ4',
-            scope: 'openid profile offline_access email api:all',
+            scope: 'openid profile offline_access email',
             responseType: 'code',
             silentRenew: true,
             useRefreshToken: true,
@@ -16,5 +16,6 @@ export const authConfig: PassedInitialConfig = {
               audience: 'https://bcs-api', // API Identifier from Auth0
             },
             secureRoutes: ['/api/'],
+
         }
 }

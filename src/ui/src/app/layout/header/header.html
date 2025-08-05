@@ -15,7 +15,7 @@
     @if (user) {
     <button routerLink="/settings" mat-menu-item>
       <div id="user-details">
-        <span class="wbba">{{ user.email }}</span>
+        <span class="wbba">{{ user.email }} {{ user.isAdmin ? '(admin)' : '' }}</span>
       </div>
     </button>
     <mat-divider></mat-divider>

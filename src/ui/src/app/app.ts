@@ -27,7 +27,8 @@ export class App implements OnInit {
   ngOnInit(): void {
     // Auth
     this.oidcSecurityService.checkAuth().subscribe(r => {
-      this.user.set(r.userData);
+      const atClaims = JSON.parse(atob(r.accessToken.split('.')[1]));
+      this.user.set({...r.userData, isAdmin: atClaims && atClaims.permissions && atClaims.permissions.includes("api:admin") });
     });
 
     // Get API version
