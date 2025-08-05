@@ -73,7 +73,7 @@ public class Program
             };
             if (builder.Configuration["MongoDb:Username"].Length > 0)
             {
-                settings.Credential = MongoCredential.CreateCredential(builder.Configuration["MongoDb:AuthDatabase"], builder.Configuration["MongoDb:Username"], builder.Configuration["MongoDb:Password"]);
+                settings.Credential = MongoCredential.CreateCredential(builder.Configuration["MongoDb:Database"], builder.Configuration["MongoDb:Username"], builder.Configuration["MongoDb:Password"]);
             }
             var client = new MongoClient(settings);
             return client.GetDatabase(builder.Configuration["MongoDb:Database"]);
