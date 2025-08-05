@@ -19,6 +19,12 @@ spec:
             {{- toYaml .Values.api.resources | nindent 12 }}
           ports:
             - containerPort: 8080
+          env:
+            - name: 'QDRANT__APIKEY'
+              valueFrom:
+                secretKeyRef:
+                  name: bcs
+                  key: apiKeyReadOnly
           livenessProbe:
             httpGet:
               path: /api/health
