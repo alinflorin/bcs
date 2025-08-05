@@ -46,9 +46,13 @@ export class App implements OnInit {
       this.theme.set(theme);
       if (theme === 'dark') {
         this.enableDarkMode();
+        document.querySelector('html')!.style.colorScheme = 'dark';
       } else {
         this.disableDarkMode();
+        document.querySelector('html')!.style.colorScheme = 'light';
       }
+    } else {
+      document.querySelector('html')!.style.colorScheme = 'light dark';
     }
   }
 
@@ -63,13 +67,16 @@ export class App implements OnInit {
     if (newTheme === 'auto') {
       localStorage.removeItem('theme');
       this.disableDarkMode();
+      document.querySelector('html')!.style.colorScheme = 'light dark';
       return;
     }
     localStorage.setItem('theme', newTheme);
     if (newTheme === 'dark') {
       this.enableDarkMode();
+      document.querySelector('html')!.style.colorScheme = 'dark';
     } else {
       this.disableDarkMode();
+      document.querySelector('html')!.style.colorScheme = 'light';
     }
   }
 
