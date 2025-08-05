@@ -27,6 +27,18 @@ spec:
                   key: apiKeyReadOnly
             - name: 'QDRANT__HOSTNAME'
               value: '{{ .Release.Name }}-qdrant'
+            - name: 'MONGODB__HOSTNAME'
+              value: '{{ .Release.Name }}-mongodb'
+            - name: 'MONGODB__USERNAME'
+              valueFrom:
+                configMapKeyRef:
+                  name: bcs
+                  key: mongodbUsername
+            - name: 'MONGODB__PASSWORD'
+              valueFrom:
+                secretKeyRef:
+                  name: bcs
+                  key: mongodbPassword
           livenessProbe:
             httpGet:
               path: /api/health

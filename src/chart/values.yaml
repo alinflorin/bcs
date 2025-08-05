@@ -56,6 +56,31 @@ qdrant:
         name: bcs
         key: apiKeyReadOnly
 
+mongodb:
+  enabled: true
+  username: root
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  storage:
+    volumeName: "mongodb-volume"
+    requestedSize: 5Gi
+    accessModes:
+      - ReadWriteOnce
+  env:
+    - name: MONGO_INITDB_ROOT_USERNAME
+      value: root
+    - name: MONGO_INITDB_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: bcs
+          key: mongodbPassword
+
 secrets:
   qdrantReadWriteApiKey: null
   qdrantReadOnlyApiKey: null
+  mongodbPassword: null

@@ -1,6 +1,7 @@
 using Bcs.Api.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 using Qdrant.Client;
 
 namespace Bcs.Api.Controllers;
@@ -8,22 +9,30 @@ namespace Bcs.Api.Controllers;
 [AllowAnonymous]
 [ApiController]
 [Route("api/[controller]")]
-public class HealthController(QdrantClient qdrantClient) : ControllerBase
+public class HealthController(QdrantClient qdrantClient, IMongoDatabase db) : ControllerBase
 {
     private readonly QdrantClient _qdrantClient = qdrantClient;
+    private readonly IMongoDatabase _db = db;
 
     [HttpGet]
     public async Task<IActionResult> Healthcheck()
     {
-        var qdrantReply = await _qdrantClient.HealthAsync(this.ControllerContext.HttpContext.RequestAborted);
-        if (qdrantReply.Version == null || qdrantReply.Version.Length == 0)
+        try
+        {
+            var qdrantReplyTask = _qdrantClient.HealthAsync(HttpContext.RequestAborted);
+            var mongoReplyTask = _db.Client.ListDatabaseNamesAsync(HttpContext.RequestAborted);
+
+            await Task.WhenAll(qdrantReplyTask, mongoReplyTask);
+        } catch (Exception e)
         {
             return StatusCode(500, new HealthcheckResponseDto { 
+                Reason = e.Message,
                 Healthy = false,
-                Version = Version.Value,
-                Reason = "Qdrant database is down"
+                Version = Version.Value
             });
         }
+        
+
         return Ok(new HealthcheckResponseDto
         {
             Healthy = true,

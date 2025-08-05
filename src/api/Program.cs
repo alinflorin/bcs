@@ -3,6 +3,7 @@ using Bcs.Api.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using Qdrant.Client;
 using System.Security.Claims;
 
@@ -63,6 +64,20 @@ public class Program
         });
 
         builder.Services.AddSingleton(_ => new QdrantClient(builder.Configuration["Qdrant:Hostname"], builder.Configuration.GetValue<int>("Qdrant:Port"), false, builder.Configuration["Qdrant:ApiKey"], TimeSpan.FromSeconds(30)));
+
+        builder.Services.AddSingleton(_ =>
+        {
+            var settings = new MongoClientSettings
+            {
+                Server = new MongoServerAddress(builder.Configuration["MongoDb:Hostname"], builder.Configuration.GetValue<int>("MongoDb:Port")),
+            };
+            if (builder.Configuration["MongoDb:Username"].Length > 0)
+            {
+                settings.Credential = MongoCredential.CreateCredential(builder.Configuration["MongoDb:AuthDatabase"], builder.Configuration["MongoDb:Username"], builder.Configuration["MongoDb:Password"]);
+            }
+            var client = new MongoClient(settings);
+            return client.GetDatabase(builder.Configuration["MongoDb:Database"]);
+        });
 
         var app = builder.Build();
 
