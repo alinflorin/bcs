@@ -9,8 +9,9 @@ namespace Bcs.Api.Controllers;
 [AllowAnonymous]
 [ApiController]
 [Route("api/[controller]")]
-public class HealthController(QdrantClient qdrantClient, IMongoDatabase db) : ControllerBase
+public class HealthController(QdrantClient qdrantClient, IMongoDatabase db, ILogger<HealthController> logger) : ControllerBase
 {
+    private readonly ILogger<HealthController> _logger = logger;
     private readonly QdrantClient _qdrantClient = qdrantClient;
     private readonly IMongoDatabase _db = db;
 
@@ -25,6 +26,7 @@ public class HealthController(QdrantClient qdrantClient, IMongoDatabase db) : Co
             await Task.WhenAll(qdrantReplyTask, mongoReplyTask);
         } catch (Exception e)
         {
+            _logger.LogError(e, "Healthcheck failed");
             return StatusCode(500, new HealthcheckResponseDto { 
                 Reason = e.Message,
                 Healthy = false,

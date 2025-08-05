@@ -58,7 +58,7 @@ qdrant:
 
 mongodb:
   enabled: true
-  username: root
+  username: bcs
   resources:
     limits:
       cpu: 1000m
@@ -74,12 +74,20 @@ mongodb:
   env:
     - name: MONGO_INITDB_ROOT_USERNAME
       value: root
+    - name: MONGO_INITDB_DATABASE
+      value: bcs
+    - name: USERDB_USER
+      value: bcs
     - name: MONGO_INITDB_ROOT_PASSWORD
       valueFrom:
         secretKeyRef:
           name: bcs
           key: mongodbPassword
-
+    - name: USERDB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: bcs
+          key: mongodbPassword
 secrets:
   qdrantReadWriteApiKey: null
   qdrantReadOnlyApiKey: null
