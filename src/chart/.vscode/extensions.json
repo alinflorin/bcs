@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "vscode-icons-team.vscode-icons",
+        "redhat.vscode-xml",
+        "redhat.vscode-yaml",
+        "tim-koehler.helm-intellisense",
+        "editorconfig.editorconfig",
+        "ms-kubernetes-tools.vscode-kubernetes-tools"
+    ]
+}

@@ -16,12 +16,7 @@ spec:
           image: ghcr.io/alinflorin/bcs-ui:{{ .Chart.AppVersion }}
           imagePullPolicy: IfNotPresent
           resources:
-            requests:
-              memory: "128Mi"
-              cpu: "250m"
-            limits:
-              memory: "1Gi"
-              cpu: "1000m"
+            {{- toYaml .Values.ui.resources | nindent 12 }}
           ports:
             - containerPort: 80
           livenessProbe:

@@ -11,20 +11,17 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
     nginx.ingress.kubernetes.io/upgrade: "websocket"
-
-    nginx.ingress.kubernetes.io/limit-rps: "20"                      # 10 requests per second
-    nginx.ingress.kubernetes.io/limit-burst: "40"                    # optional: allows short bursts
-    nginx.ingress.kubernetes.io/limit-burst-multiplier: "1"
-    nginx.ingress.kubernetes.io/limit-rate-after: "0"                # apply immediately
-    # nginx.ingress.kubernetes.io/limit-connections: "1"               # optional: limit concurrent connections
+    {{- with .Values.ingress.extraAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 
 spec:
   tls:
     - hosts:
-        - bcs{{ if ne .Values.environment "prd" }}-{{ .Values.environment }}{{ end }}.internal.huna2.com
+        - {{ .Values.ingress.domain }}
       secretName: bcs-tls
   rules:
-    - host: bcs{{ if ne .Values.environment "prd" }}-{{ .Values.environment }}{{ end }}.internal.huna2.com
+    - host: {{ .Values.ingress.domain }}
       http:
         paths:
           - path: /

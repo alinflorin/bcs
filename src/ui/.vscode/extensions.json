@@ -2,6 +2,13 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=827846
   "recommendations": [
     "angular.ng-template",
-    "chr33z.lingua-vscode"
+    "chr33z.lingua-vscode",
+    "ecmel.vscode-html-css",
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+    "esbenp.prettier-vscode",
+    "vscode-icons-team.vscode-icons",
+    "editorconfig.editorconfig",
+    "dbaeumer.vscode-eslint"
   ]
 }

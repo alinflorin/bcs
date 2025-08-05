@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        "kreativ-software.csharpextensions",
+        "editorconfig.editorconfig",
+        "vscode-icons-team.vscode-icons"
+    ]
+}

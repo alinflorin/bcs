@@ -8,44 +8,37 @@
     @if (!user) {
     <mat-icon>more_vert</mat-icon>
     } @else {
-    <mat-icon>person</mat-icon>
+    <mat-icon><img loading="lazy" style="border-radius: 50%;" [src]="user.picture" /></mat-icon>
     }
   </button>
   <mat-menu #menu="matMenu">
     @if (user) {
     <button routerLink="/settings" mat-menu-item>
       <div id="user-details">
-        <img
-          [src]="user.picture"
-          width="24"
-          height="24"
-          loading="lazy"
-          style="border-radius: 50%; margin-right: 8px"
-        />
         <span class="wbba">{{ user.email }}</span>
       </div>
     </button>
     <mat-divider></mat-divider>
     }
     <button mat-menu-item [matMenuTriggerFor]="languageMenu">
-      {{ "ui.layout.header.language" | translate }}
+      <mat-icon>language</mat-icon>{{ "ui.layout.header.language" | translate }}
     </button>
     <button mat-menu-item [matMenuTriggerFor]="themeMenu">
-      {{ "ui.layout.header.theme" | translate }}
+      <mat-icon>palette</mat-icon>{{ "ui.layout.header.theme" | translate }}
     </button>
     <button routerLink="/about" mat-menu-item>
-      {{ "ui.layout.header.about" | translate }}
+      <mat-icon>info</mat-icon>{{ "ui.layout.header.about" | translate }}
     </button>
     @if (user) {
     <button routerLink="/settings" mat-menu-item>
-      {{ "ui.layout.header.settings" | translate }}
+      <mat-icon>settings</mat-icon>{{ "ui.layout.header.settings" | translate }}
     </button>
     <button (click)="onLogoutClicked.emit()" mat-menu-item>
-      {{ "ui.layout.header.logout" | translate }}
+      <mat-icon>logout</mat-icon>{{ "ui.layout.header.logout" | translate }}
     </button>
     } @else {
     <button (click)="onLoginClicked.emit()" mat-menu-item>
-      {{ "ui.layout.header.login" | translate }}
+      <mat-icon>login</mat-icon>{{ "ui.layout.header.login" | translate }}
     </button>
     }
   </mat-menu>
@@ -57,34 +50,34 @@
       } @else {
       <mat-icon></mat-icon>
       }
-      <span>{{ l.name }}</span>
+      <mat-icon><img [src]="'/images/' + l.code + '.svg'" /></mat-icon><span>{{ l.name }}</span>
     </button>
     }
   </mat-menu>
   <mat-menu #themeMenu="matMenu">
     <button (click)="onThemeChanged.emit('auto')" mat-menu-item>
       @if(theme === 'auto') {
-        <mat-icon>check</mat-icon>
+      <mat-icon>check</mat-icon>
       } @else {
-        <mat-icon></mat-icon>
+      <mat-icon></mat-icon>
       }
-      <span>{{ "ui.layout.header.themes.auto" | translate }}</span>
+      <mat-icon>brightness_auto</mat-icon><span>{{ "ui.layout.header.themes.auto" | translate }}</span>
     </button>
     <button (click)="onThemeChanged.emit('light')" mat-menu-item>
       @if(theme === 'light') {
-        <mat-icon>check</mat-icon>
+      <mat-icon>check</mat-icon>
       } @else {
-        <mat-icon></mat-icon>
+      <mat-icon></mat-icon>
       }
-      <span>{{ "ui.layout.header.themes.light" | translate }}</span>
+      <mat-icon>light_mode</mat-icon><span>{{ "ui.layout.header.themes.light" | translate }}</span>
     </button>
     <button (click)="onThemeChanged.emit('dark')" mat-menu-item>
       @if(theme === 'dark') {
-        <mat-icon>check</mat-icon>
+      <mat-icon>check</mat-icon>
       } @else {
-        <mat-icon></mat-icon>
+      <mat-icon></mat-icon>
       }
-      <span>{{ "ui.layout.header.themes.dark" | translate }}</span>
+      <mat-icon>dark_mode</mat-icon><span>{{ "ui.layout.header.themes.dark" | translate }}</span>
     </button>
   </mat-menu>
 </mat-toolbar>
