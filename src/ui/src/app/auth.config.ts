@@ -10,6 +10,8 @@ export const authConfig: PassedInitialConfig = {
             responseType: 'code',
             silentRenew: true,
             useRefreshToken: true,
+            triggerRefreshWhenIdTokenExpired: false,
+            ignoreNonceAfterRefresh: true,
             customParamsAuthRequest: {
               audience: 'https://bcs-api', // API Identifier from Auth0
             },

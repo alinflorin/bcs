@@ -37,7 +37,6 @@ export class App implements OnInit {
 
     // Translate
     this.translate.addLangs(config.languages.map(x => x.code));
-    this.translate.setDefaultLang(config.defaultLanguage);
     this.translate.use(localStorage.getItem('lang') || this.translate.getBrowserLang() || config.defaultLanguage);
 
     // Theme
