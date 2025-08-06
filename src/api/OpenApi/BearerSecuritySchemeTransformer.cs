@@ -17,7 +17,7 @@ namespace Bcs.Api.OpenApi
                     {
                         Type = SecuritySchemeType.OAuth2,
                         BearerFormat = "Bearer",
-                        OpenIdConnectUrl = new Uri(config["Oidc:Authority"]),
+                        OpenIdConnectUrl = new Uri(config["Oidc:Authority"]!),
                         In = ParameterLocation.Header,
                         Scheme = "Bearer",
                         Name = "Authorization",

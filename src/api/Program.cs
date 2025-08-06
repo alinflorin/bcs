@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Qdrant.Client;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace Bcs.Api;
 
@@ -60,24 +61,31 @@ public class Program
             options.DefaultPolicy = requireAuthPolicy;
         });
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers().AddJsonOptions(j =>
+        {
+            j.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            j.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            j.JsonSerializerOptions.UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Skip;
+            j.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
+            j.JsonSerializerOptions.RespectNullableAnnotations = true;
+        });
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi(options =>
         {
             options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
         });
 
-        builder.Services.AddSingleton(_ => new QdrantClient(builder.Configuration["Qdrant:Hostname"], builder.Configuration.GetValue<int>("Qdrant:Port"), false, builder.Configuration["Qdrant:ApiKey"], TimeSpan.FromSeconds(30)));
+        builder.Services.AddSingleton(_ => new QdrantClient(builder.Configuration["Qdrant:Hostname"]!, builder.Configuration.GetValue<int>("Qdrant:Port"), false, builder.Configuration["Qdrant:ApiKey"], TimeSpan.FromSeconds(30)));
 
         builder.Services.AddSingleton(_ =>
         {
             var settings = new MongoClientSettings
             {
-                Server = new MongoServerAddress(builder.Configuration["MongoDb:Hostname"], builder.Configuration.GetValue<int>("MongoDb:Port")),
+                Server = new MongoServerAddress(builder.Configuration["MongoDb:Hostname"]!, builder.Configuration.GetValue<int>("MongoDb:Port")),
             };
-            if (builder.Configuration["MongoDb:Username"].Length > 0)
+            if (builder.Configuration["MongoDb:Username"]!.Length > 0)
             {
-                settings.Credential = MongoCredential.CreateCredential(builder.Configuration["MongoDb:Database"], builder.Configuration["MongoDb:Username"], builder.Configuration["MongoDb:Password"]);
+                settings.Credential = MongoCredential.CreateCredential(builder.Configuration["MongoDb:Database"]!, builder.Configuration["MongoDb:Username"]!, builder.Configuration["MongoDb:Password"]!);
             }
             var client = new MongoClient(settings);
             return client.GetDatabase(builder.Configuration["MongoDb:Database"]);
@@ -97,7 +105,7 @@ public class Program
                 options.OAuthClientId(app.Configuration["Oidc:ClientId"]);
                 options.OAuthAdditionalQueryStringParams(new Dictionary<string, string>
                 {
-                    { "audience", app.Configuration["Oidc:Audience"] }
+                    { "audience", app.Configuration["Oidc:Audience"]! }
                 });
                 options.OAuthUsePkce();
                 options.OAuthAppName("BCS API");
