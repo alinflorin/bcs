@@ -24,7 +24,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: bcs
-                  key: apiKeyReadOnly
+                  key: apiKeyReadWrite
             - name: 'QDRANT__HOSTNAME'
               value: '{{ .Release.Name }}-qdrant'
             - name: 'MONGODB__HOSTNAME'
