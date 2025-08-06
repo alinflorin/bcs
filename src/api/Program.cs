@@ -65,9 +65,9 @@ public class Program
         {
             j.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             j.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            j.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             j.JsonSerializerOptions.UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Skip;
             j.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
-            j.JsonSerializerOptions.RespectNullableAnnotations = true;
         });
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi(options =>
