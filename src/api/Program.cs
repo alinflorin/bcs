@@ -10,6 +10,7 @@ using Qdrant.Client;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Security.Claims;
 using System.Text.Json;
+using AutoMapper;
 
 namespace Bcs.Api;
 
@@ -95,9 +96,12 @@ public class Program
         });
 
         builder.Services.AddScoped<IHealthService, HealthService>();
+        builder.Services.AddScoped<IAdminService, AdminService>();
 
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();
         builder.Services.AddFluentValidationAutoValidation();
+
+        builder.Services.AddAutoMapper(cfg => {}, typeof(Program).Assembly);
 
         var app = builder.Build();
 
