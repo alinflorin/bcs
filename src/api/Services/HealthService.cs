@@ -1,6 +1,4 @@
 ﻿using Bcs.Api.Dto;
-using MongoDB.Driver;
-using Qdrant.Client;
 
 namespace Bcs.Api.Services
 {
