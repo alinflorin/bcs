@@ -17,6 +17,14 @@ namespace Bcs.Api.Services
             return await _qdrantClient.CollectionExistsAsync(name, ct);
         }
 
+        public async Task CreateCollection(string name, int size, CancellationToken ct = default)
+        {
+            await _qdrantClient.CreateCollectionAsync(name, new Qdrant.Client.Grpc.VectorParams { 
+                Distance = Qdrant.Client.Grpc.Distance.Cosine,
+                Size = (ulong)size
+            }, cancellationToken: ct);
+        }
+
         public async Task<IEnumerable<string>> GetCollections(CancellationToken ct = default)
         {
             return await _qdrantClient.ListCollectionsAsync(ct);
