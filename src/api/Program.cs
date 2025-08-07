@@ -1,10 +1,13 @@
 
 using Bcs.Api.OpenApi;
+using Bcs.Api.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Qdrant.Client;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -90,6 +93,11 @@ public class Program
             var client = new MongoClient(settings);
             return client.GetDatabase(builder.Configuration["MongoDb:Database"]);
         });
+
+        builder.Services.AddScoped<IHealthService, HealthService>();
+
+        builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+        builder.Services.AddFluentValidationAutoValidation();
 
         var app = builder.Build();
 
