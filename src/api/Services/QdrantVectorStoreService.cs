@@ -11,6 +11,11 @@ namespace Bcs.Api.Services
             _qdrantClient = new QdrantClient(config.Qdrant!.Hostname, config.Qdrant!.Port, false, config.Qdrant!.ApiKey, TimeSpan.FromSeconds(30));
         }
 
+        public async Task<bool> CollectionExists(string name, CancellationToken ct = default)
+        {
+            return await _qdrantClient.CollectionExistsAsync(name, ct);
+        }
+
         public async Task<IEnumerable<string>> GetCollections(CancellationToken ct = default)
         {
             return await _qdrantClient.ListCollectionsAsync(ct);
