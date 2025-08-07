@@ -15,7 +15,6 @@ export const authConfig: PassedInitialConfig = {
             customParamsAuthRequest: {
               audience: 'https://bcs-api', // API Identifier from Auth0
             },
-            secureRoutes: ['/api/'],
-
+            secureRoutes: ['/api/']
         }
 }
