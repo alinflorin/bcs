@@ -4,23 +4,24 @@ using Qdrant.Client;
 
 namespace Bcs.Api.Services
 {
-    public class HealthService(IMongoDatabase db, QdrantClient qdrantClient) : IHealthService
+    public class HealthService(IVectorStoreService vectorStoreService, IDatabaseService dbService) : IHealthService
     {
-        private readonly IMongoDatabase _db = db;
-        private readonly QdrantClient _qdrantClient = qdrantClient;
+        private readonly IVectorStoreService _vectorStoreService = vectorStoreService;
+        private readonly IDatabaseService _dbService = dbService;
+
 
         public async Task<HealthcheckResponseDto> CheckHealth(CancellationToken ct = default)
         {
             try
             {
-                var qdrantReplyTask = _qdrantClient.HealthAsync(ct);
-                var mongoReplyTask = _db.Client.ListDatabaseNamesAsync(ct);
+                var qdrantReplyTask = _vectorStoreService.Healthcheck(ct);
+                var mongoReplyTask = _dbService.Healthcheck(ct);
 
                 await Task.WhenAll(qdrantReplyTask, mongoReplyTask);
 
                 return new HealthcheckResponseDto
                 {
-                    Healthy = qdrantReplyTask.Result.Version != null && qdrantReplyTask.Result.Version.Length > 0 && mongoReplyTask.Result.Any(ct),
+                    Healthy = qdrantReplyTask.Result == true && qdrantReplyTask.Result == true,
                     Version = Version.Value
                 };
             } catch (Exception e)

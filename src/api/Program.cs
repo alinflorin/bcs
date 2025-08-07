@@ -79,24 +79,12 @@ public class Program
             options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
         });
 
-        builder.Services.AddSingleton(_ => new QdrantClient(builder.Configuration["Qdrant:Hostname"]!, builder.Configuration.GetValue<int>("Qdrant:Port"), false, builder.Configuration["Qdrant:ApiKey"], TimeSpan.FromSeconds(30)));
 
-        builder.Services.AddSingleton(_ =>
-        {
-            var settings = new MongoClientSettings
-            {
-                Server = new MongoServerAddress(builder.Configuration["MongoDb:Hostname"]!, builder.Configuration.GetValue<int>("MongoDb:Port")),
-            };
-            if (builder.Configuration["MongoDb:Username"]!.Length > 0)
-            {
-                settings.Credential = MongoCredential.CreateCredential(builder.Configuration["MongoDb:Database"]!, builder.Configuration["MongoDb:Username"]!, builder.Configuration["MongoDb:Password"]!);
-            }
-            var client = new MongoClient(settings);
-            return client.GetDatabase(builder.Configuration["MongoDb:Database"]);
-        });
+        builder.Services.AddSingleton<IDatabaseService, MongoDbDatabaseService>();
+        builder.Services.AddSingleton<IVectorStoreService, QdrantVectorStoreService>();
 
-        builder.Services.AddScoped<IHealthService, HealthService>();
-        builder.Services.AddScoped<IAdminService, AdminService>();
+        builder.Services.AddSingleton<IHealthService, HealthService>();
+        builder.Services.AddSingleton<IAdminService, AdminService>();
 
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();
         builder.Services.AddFluentValidationAutoValidation();
