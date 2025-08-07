@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apk add --no-cache brotli gzip
 COPY ./package.json ./package.json
 COPY ./package-lock.json ./package-lock.json
-RUN npm i
+RUN npm i --legacy-peer-deps
 COPY . .
 RUN echo "export const version = '$VERSION';" > ./src/version.ts
 RUN npm run build
