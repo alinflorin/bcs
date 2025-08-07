@@ -88,6 +88,7 @@ public class Program
 
         builder.Services.AddSingleton<IHealthService, HealthService>();
         builder.Services.AddSingleton<IAdminService, AdminService>();
+        builder.Services.AddSingleton<ITextExtractorService, PdfPigTextExtractorService>();
 
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();
         builder.Services.AddFluentValidationAutoValidation();
