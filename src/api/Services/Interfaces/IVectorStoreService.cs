@@ -1,4 +1,4 @@
-﻿namespace Bcs.Api.Services
+﻿namespace Bcs.Api.Services.Interfaces
 {
     public interface IVectorStoreService
     {

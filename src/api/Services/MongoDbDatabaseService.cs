@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using Bcs.Api.Services.Interfaces;
+using MongoDB.Driver;
 
 namespace Bcs.Api.Services
 {

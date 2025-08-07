@@ -1,4 +1,5 @@
 ﻿using Bcs.Api.Dto;
+using Bcs.Api.Services.Interfaces;
 
 namespace Bcs.Api.Services
 {

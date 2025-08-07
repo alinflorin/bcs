@@ -1,5 +1,5 @@
 ﻿using Bcs.Api.Dto;
-using Bcs.Api.Services;
+using Bcs.Api.Services.Interfaces;
 using FluentValidation;
 
 namespace Bcs.Api.Validators

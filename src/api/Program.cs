@@ -1,6 +1,7 @@
 
 using Bcs.Api.OpenApi;
 using Bcs.Api.Services;
+using Bcs.Api.Services.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

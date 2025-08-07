@@ -1,4 +1,5 @@
-﻿using Qdrant.Client;
+﻿using Bcs.Api.Services.Interfaces;
+using Qdrant.Client;
 
 namespace Bcs.Api.Services
 {
