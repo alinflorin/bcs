@@ -4,6 +4,6 @@ namespace Bcs.Api.Services
 {
     public interface IAdminService
     {
-        Task<IEnumerable<CollectionDto>> GetCollections(CancellationToken ct = default);
+        Task<IEnumerable<VectorCollectionDto>> GetCollections(CancellationToken ct = default);
     }
 }

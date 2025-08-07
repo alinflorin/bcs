@@ -6,11 +6,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
-using Qdrant.Client;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Security.Claims;
 using System.Text.Json;
-using AutoMapper;
 
 namespace Bcs.Api;
 
@@ -22,21 +20,25 @@ public class Program
 
         // Add services to the container.
 
+        var appConfig = new AppConfig();
+        builder.Configuration.Bind(appConfig);
+        builder.Services.AddSingleton(appConfig);
+
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         })
         .AddJwtBearer(options =>
         {
-            options.Authority = builder.Configuration["Oidc:Authority"];
-            options.Audience = builder.Configuration["Oidc:Audience"];
+            options.Authority = appConfig.Oidc!.Authority;
+            options.Audience = appConfig.Oidc!.Audience;
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidIssuer = builder.Configuration["Oidc:Authority"],
+                ValidIssuer = appConfig.Oidc!.Authority,
 
                 ValidateAudience = true,
-                ValidAudience = builder.Configuration["Oidc:Audience"],
+                ValidAudience = appConfig.Oidc!.Audience,
 
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.FromMinutes(1),
@@ -102,10 +104,10 @@ public class Program
             {
                 options.SwaggerEndpoint("/api/openapi/v1.json", "v1");
                 options.RoutePrefix = "api/swagger";
-                options.OAuthClientId(app.Configuration["Oidc:ClientId"]);
+                options.OAuthClientId(appConfig.Oidc!.ClientId);
                 options.OAuthAdditionalQueryStringParams(new Dictionary<string, string>
                 {
-                    { "audience", app.Configuration["Oidc:Audience"]! }
+                    { "audience", appConfig.Oidc!.Audience }
                 });
                 options.OAuthUsePkce();
                 options.OAuthAppName("BCS API");

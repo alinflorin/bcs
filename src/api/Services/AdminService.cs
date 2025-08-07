@@ -5,10 +5,10 @@ namespace Bcs.Api.Services
     {
         private readonly IVectorStoreService _vectorStoreService = vectorStoreService;
 
-        public async Task<IEnumerable<CollectionDto>> GetCollections(CancellationToken ct = default)
+        public async Task<IEnumerable<VectorCollectionDto>> GetCollections(CancellationToken ct = default)
         {
             return (await _vectorStoreService.GetCollections(ct))
-                .Select(c => new CollectionDto { Name = c })
+                .Select(c => new VectorCollectionDto { Name = c })
                 .ToList();
 
         }

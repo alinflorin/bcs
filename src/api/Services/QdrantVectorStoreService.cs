@@ -6,9 +6,9 @@ namespace Bcs.Api.Services
     {
         private readonly QdrantClient _qdrantClient;
 
-        public QdrantVectorStoreService(IConfiguration config)
+        public QdrantVectorStoreService(AppConfig config)
         {
-            _qdrantClient = new QdrantClient(config["Qdrant:Hostname"]!, config.GetValue<int>("Qdrant:Port"), false, config["Qdrant:ApiKey"], TimeSpan.FromSeconds(30));
+            _qdrantClient = new QdrantClient(config.Qdrant!.Hostname, config.Qdrant!.Port, false, config.Qdrant!.ApiKey, TimeSpan.FromSeconds(30));
         }
 
         public async Task<IEnumerable<string>> GetCollections(CancellationToken ct = default)

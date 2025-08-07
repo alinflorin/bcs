@@ -1,6 +1,6 @@
 ﻿namespace Bcs.Api.Dto
 {
-    public class CollectionDto
+    public class VectorCollectionDto
     {
         public required string Name { get; set; }
     }
