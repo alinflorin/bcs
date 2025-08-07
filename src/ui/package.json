@@ -41,5 +41,8 @@
     "@angular/cli": "^20.1.5",
     "@angular/compiler-cli": "^20.1.6",
     "typescript": "~5.8.2"
+  },
+  "overrides": {
+    "tmp": "^0.2.4"
   }
 }
