@@ -1,5 +1,6 @@
 ﻿using Bcs.Api.Dto;
 using Bcs.Api.Helpers;
+using Bcs.Api.Models;
 using Bcs.Api.Services.Interfaces;
 
 namespace Bcs.Api.Services
@@ -23,16 +24,30 @@ namespace Bcs.Api.Services
 
             await _vectorStoreService.CreateCollection(collection.Name, ct);
 
+            var points = new List<VectorPoint>();
+            
             foreach (var (fileName, text) in filesWithText)
             {
                 var chunks = StringHelper.ChunkText(text, 1000, 200);
-
+                var i = 0;
                 foreach (var chunk in chunks)
                 {
                     var vectors = await _embeddingService.GetEmbedding(chunk, ct);
-                    // TODO
+                    var point = new VectorPoint
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Payload = new Dictionary<string, string>
+                        {
+                            {"fileName", fileName },
+                            {"chunkIndex", i.ToString() }
+                        },
+                        Vectors = vectors
+                    };
+                    i++;
+                    points.Add(point);
                 }
             }
+            // TODO insert points
 
             return new VectorCollectionDto { Name = collection.Name };
         }

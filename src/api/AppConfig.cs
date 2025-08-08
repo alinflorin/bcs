@@ -36,5 +36,7 @@
     public class GeminiConfig
     {
         public required string ApiKey { get; set; }
+        public required string EmbeddingModel { get; set; }
+        public required string OpenAiUri { get; set; }
     }
 }
