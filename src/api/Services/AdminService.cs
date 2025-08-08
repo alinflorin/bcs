@@ -83,14 +83,6 @@ namespace Bcs.Api.Services
 
         public async Task<VectorCollectionDto> DeleteVectorCollection(string collectionName, CancellationToken ct = default)
         {
-            var check = await _vectorStoreService.CollectionExists(collectionName, ct);
-            if (!check)
-            {
-                return new VectorCollectionDto
-                {
-                    Name = collectionName
-                };
-            }
             await _vectorStoreService.DeleteCollection(collectionName, ct);
             return new VectorCollectionDto { 
                 Name = collectionName
