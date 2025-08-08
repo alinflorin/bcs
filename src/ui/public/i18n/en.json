@@ -1,4 +1,12 @@
 {
+  "api": {
+    "validation": {
+      "required": "Required",
+      "alreadyExists": "Already exists",
+      "fatalError": "Fatal error",
+      "invalidRequest": "Invalid request"
+    }
+  },
   "ui": {
     "layout": {
       "header": {

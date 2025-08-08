@@ -1,4 +1,12 @@
 {
+  "api": {
+    "validation": {
+      "required": "Obligatoriu",
+      "alreadyExists": "Deja există",
+      "fatalError": "Eroare fatală",
+      "invalidRequest": "Request invalid"
+    }
+  },
   "ui": {
     "layout": {
       "header": {

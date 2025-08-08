@@ -34,7 +34,7 @@ namespace Bcs.Api.Controllers
             if (dto == null)
             {
                 return BadRequest(new Dictionary<string, string[]> {
-                    {"", ["api.admin.createCollection.invalidRequest"] }
+                    {"", ["api.validation.invalidRequest"] }
                 });
             }
             var validationResult = await _createVectorCollectionDtoValidator.ValidateAsync(dto, HttpContext.RequestAborted);
