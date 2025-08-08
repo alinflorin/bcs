@@ -11,7 +11,10 @@ namespace Bcs.Api.Validators
             RuleFor(x => x.Name)
                 .NotEmpty()
                 .WithMessage("api.validation.required")
-                .MustAsync(vectorStoreService.CollectionExists)
+                .MustAsync(async (x, y, z, w) => {
+                    var result = await vectorStoreService.CollectionExists(y, w);
+                    return !result;
+                })
                 .WithMessage("api.validation.alreadyExists");
         }
     }

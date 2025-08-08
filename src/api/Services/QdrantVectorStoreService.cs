@@ -1,5 +1,7 @@
-﻿using Bcs.Api.Services.Interfaces;
+﻿using Bcs.Api.Models;
+using Bcs.Api.Services.Interfaces;
 using Qdrant.Client;
+using Qdrant.Client.Grpc;
 
 namespace Bcs.Api.Services
 {
@@ -28,6 +30,11 @@ namespace Bcs.Api.Services
             }, cancellationToken: ct);
         }
 
+        public async Task DeleteCollection(string name, CancellationToken ct = default)
+        {
+            await _qdrantClient.DeleteCollectionAsync(name, cancellationToken: ct);
+        }
+
         public async Task<IEnumerable<string>> GetCollections(CancellationToken ct = default)
         {
             return await _qdrantClient.ListCollectionsAsync(ct);
@@ -37,6 +44,25 @@ namespace Bcs.Api.Services
         {
             var reply = await _qdrantClient.HealthAsync(ct);
             return reply.Version != null;
+        }
+
+        public async Task UpsertPoints(string collectionName, IEnumerable<VectorPoint> points, CancellationToken ct = default)
+        {
+            var transformedPoints = points.AsParallel()
+                .Select(x => new PointStruct
+                {
+                    Id = (ulong)x.Id,
+                    Vectors = x.Vectors,
+                    Payload =
+                    {
+                        ["fileName"] = x.FileName,
+                        ["chunkIndex"] = x.ChunkIndex,
+                        ["batchIndex"] = x.BatchIndex,
+                        ["text"] = x.Text
+                    }
+                })
+                .ToList();
+            await _qdrantClient.UpsertAsync(collectionName, transformedPoints, cancellationToken: ct);
         }
     }
 }

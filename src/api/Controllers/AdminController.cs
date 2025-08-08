@@ -1,4 +1,5 @@
 ﻿using Bcs.Api.Dto;
+using Bcs.Api.Helpers;
 using Bcs.Api.Services.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -16,20 +17,20 @@ namespace Bcs.Api.Controllers
         private readonly IAdminService _adminService = adminService;
         private readonly IValidator<CreateVectorCollectionDto> _createVectorCollectionDtoValidator = createVectorCollectionDtoValidator;
 
-        [HttpGet("collections")]
-        public async Task<IActionResult> GetCollections()
+        [HttpGet("vector-collections")]
+        public async Task<IActionResult> GetVectorCollections()
         {
             return Ok(
-                await _adminService.GetCollections(HttpContext.RequestAborted)
+                await _adminService.GetVectorCollections(HttpContext.RequestAborted)
                 );
         }
 
-        [HttpPost("collections")]
+        [HttpPost("vector-collections")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateCollection([FromForm] string createVectorCollectionDtoString, [FromForm] List<IFormFile> pdfFiles)
+        public async Task<IActionResult> CreateVectorCollection([FromForm] string createVectorCollectionDtoString, [FromForm] List<IFormFile> pdfFiles)
         {
             using var ms = new MemoryStream(Encoding.UTF8.GetBytes(createVectorCollectionDtoString));
-            var dto = await JsonSerializer.DeserializeAsync<CreateVectorCollectionDto>(ms, cancellationToken: HttpContext.RequestAborted);
+            var dto = await JsonSerializer.DeserializeAsync<CreateVectorCollectionDto>(ms, JsonHelper.GetOptions(), cancellationToken: HttpContext.RequestAborted);
             if (dto == null)
             {
                 return BadRequest(new Dictionary<string, string[]> {
@@ -52,7 +53,7 @@ namespace Bcs.Api.Controllers
                 });
             }
 
-            var serviceResponse = await _adminService.CreateCollection(dto, files, HttpContext.RequestAborted);
+            var serviceResponse = await _adminService.CreateVectorCollection(dto, files, HttpContext.RequestAborted);
 
             foreach (var file in files)
             {
@@ -60,6 +61,12 @@ namespace Bcs.Api.Controllers
             }
 
             return Ok(serviceResponse);
+        }
+
+        [HttpDelete("vector-collections/[collectionName]")]
+        public async Task<IActionResult> DeleteVectorCollection([FromRoute] string collectionName)
+        {
+            return Ok(await _adminService.DeleteVectorCollection(collectionName, HttpContext.RequestAborted));
         }
 
     }

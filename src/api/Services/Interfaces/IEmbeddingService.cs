@@ -2,6 +2,6 @@
 {
     public interface IEmbeddingService
     {
-        Task<float[]> GetEmbedding(string content, CancellationToken ct = default);
+        Task<IEnumerable<float[]>> GetEmbeddings(IEnumerable<string> content, CancellationToken ct = default);
     }
 }

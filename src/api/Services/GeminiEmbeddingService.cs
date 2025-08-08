@@ -16,10 +16,10 @@ namespace Bcs.Api.Services
             });
         }
 
-        public async Task<float[]> GetEmbedding(string content, CancellationToken ct = default)
+        public async Task<IEnumerable<float[]>> GetEmbeddings(IEnumerable<string> content, CancellationToken ct = default)
         {
-            var result = await _embeddingClient.GenerateEmbeddingAsync(content);
-            return result.Value.ToFloats().ToArray();
+            var result = await _embeddingClient.GenerateEmbeddingsAsync(content, cancellationToken: ct);
+            return result.Value.AsParallel().Select(x => x.ToFloats().ToArray()).ToList();
         }
     }
 }
