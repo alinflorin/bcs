@@ -63,7 +63,7 @@ namespace Bcs.Api.Controllers
             return Ok(serviceResponse);
         }
 
-        [HttpDelete("vector-collections/[collectionName]")]
+        [HttpDelete("vector-collections/{collectionName}")]
         public async Task<IActionResult> DeleteVectorCollection([FromRoute] string collectionName)
         {
             return Ok(await _adminService.DeleteVectorCollection(collectionName, HttpContext.RequestAborted));

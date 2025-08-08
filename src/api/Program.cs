@@ -1,10 +1,12 @@
 
+using Bcs.Api.Dto;
 using Bcs.Api.OpenApi;
 using Bcs.Api.Services;
 using Bcs.Api.Services.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
@@ -99,6 +101,26 @@ public class Program
         builder.Services.AddAutoMapper(cfg => {}, typeof(Program).Assembly);
 
         var app = builder.Build();
+
+        app.UseExceptionHandler(errorApp =>
+        {
+            errorApp.Run(async context =>
+            {
+                var exceptionHandlerPathFeature =
+                    context.Features.Get<IExceptionHandlerPathFeature>();
+
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                context.Response.ContentType = "application/json";
+
+                await context.Response.WriteAsJsonAsync(new ExceptionDto
+                {
+                    Status = 500,
+                    Title = "Server Error",
+                    Message = exceptionHandlerPathFeature?.Error.Message,
+                    StackTrace = app.Environment.IsDevelopment() ? exceptionHandlerPathFeature?.Error.StackTrace : null
+                });
+            });
+        });
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
