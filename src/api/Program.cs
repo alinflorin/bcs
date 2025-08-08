@@ -1,5 +1,3 @@
-
-using Bcs.Api.Dto;
 using Bcs.Api.OpenApi;
 using Bcs.Api.Services;
 using Bcs.Api.Services.Interfaces;
@@ -111,13 +109,9 @@ public class Program
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/json";
-
-                await context.Response.WriteAsJsonAsync(new ExceptionDto
+                await context.Response.WriteAsJsonAsync(new Dictionary<string, string[]>
                 {
-                    Status = 500,
-                    Title = "Server Error",
-                    Message = exceptionHandlerPathFeature?.Error.Message,
-                    StackTrace = app.Environment.IsDevelopment() ? exceptionHandlerPathFeature?.Error.StackTrace : null
+                    {"", [ exceptionHandlerPathFeature == null ? "api.exception.fatalError" : exceptionHandlerPathFeature!.Error.Message + (app.Environment.IsDevelopment() ? " - " + exceptionHandlerPathFeature!.Error.StackTrace : "") ] }
                 });
             });
         });
