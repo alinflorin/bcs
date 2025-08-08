@@ -71,6 +71,5 @@ namespace Bcs.Api.Controllers
         {
             return Ok(await _adminService.DeleteVectorCollection(collectionName, HttpContext.RequestAborted));
         }
-
     }
 }

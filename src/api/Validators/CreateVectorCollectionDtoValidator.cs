@@ -12,6 +12,10 @@ namespace Bcs.Api.Validators
                 .NotEmpty()
                 .WithMessage("api.validation.required")
                 .MustAsync(async (x, y, z, w) => {
+                    if (string.IsNullOrEmpty(y))
+                    {
+                        return true;
+                    }
                     var result = await vectorStoreService.CollectionExists(y, w);
                     return !result;
                 })

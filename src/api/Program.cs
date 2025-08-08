@@ -1,6 +1,7 @@
 using Bcs.Api.OpenApi;
 using Bcs.Api.Services;
 using Bcs.Api.Services.Interfaces;
+using Bcs.Api.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -94,7 +95,9 @@ public class Program
         builder.Services.AddSingleton<IEmbeddingService, GeminiEmbeddingService>();
 
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-        builder.Services.AddFluentValidationAutoValidation();
+        builder.Services.AddFluentValidationAutoValidation(c => {
+            c.OverrideDefaultResultFactoryWith<AutoValidationCustomResultFactory>();
+        });
 
         builder.Services.AddAutoMapper(cfg => {}, typeof(Program).Assembly);
 
