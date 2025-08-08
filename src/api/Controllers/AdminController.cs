@@ -81,5 +81,21 @@ namespace Bcs.Api.Controllers
         {
             return Ok(await _adminService.DeleteVectorCollection(collectionName, HttpContext.RequestAborted));
         }
+
+        [HttpGet("settings")]
+        public async Task<IActionResult> GetSettings()
+        {
+            return Ok(
+                await _adminService.GetSettings(HttpContext.RequestAborted)
+                );
+        }
+
+        [HttpPut("settings")]
+        public async Task<IActionResult> SaveSettings([FromBody] SettingsDto dto)
+        {
+            return Ok(
+                await _adminService.SaveSettings(dto, HttpContext.RequestAborted)
+                );
+        }
     }
 }

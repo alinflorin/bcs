@@ -93,6 +93,7 @@ public class Program
         builder.Services.AddSingleton<IAdminService, AdminService>();
         builder.Services.AddSingleton<ITextExtractorService, PdfPigTextExtractorService>();
         builder.Services.AddSingleton<IEmbeddingService, GeminiEmbeddingService>();
+        builder.Services.AddSingleton<ISettingsService, SettingsService>();
 
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();
         builder.Services.AddFluentValidationAutoValidation(c => {

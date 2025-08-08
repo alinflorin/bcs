@@ -6,6 +6,7 @@
         public QdrantConfig? Qdrant { get; set; }
         public MongoDbConfig? MongoDb { get; set; }
         public GeminiConfig? Gemini { get; set; }
+        public DefaultSettingsConfig? DefaultSettings { get; set; }
     }
 
     public class OidcConfig
@@ -38,5 +39,10 @@
         public required string ApiKey { get; set; }
         public required string EmbeddingModel { get; set; }
         public required string OpenAiUri { get; set; }
+    }
+
+    public class DefaultSettingsConfig
+    {
+        public required string SystemPrompt { get; set; }
     }
 }

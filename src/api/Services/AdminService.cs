@@ -5,13 +5,13 @@ using Bcs.Api.Services.Interfaces;
 
 namespace Bcs.Api.Services
 {
-    public class AdminService(IVectorStoreService vectorStoreService, ITextExtractorService textExtractorService, AppConfig appConfig, IEmbeddingService embeddingService) : IAdminService
+    public class AdminService(ISettingsService settingsService, IVectorStoreService vectorStoreService, ITextExtractorService textExtractorService, AppConfig appConfig, IEmbeddingService embeddingService) : IAdminService
     {
         private readonly IVectorStoreService _vectorStoreService = vectorStoreService;
         private readonly ITextExtractorService _textExtractorService = textExtractorService;
         private readonly AppConfig _appConfig = appConfig;
         private readonly IEmbeddingService _embeddingService = embeddingService;
-
+        private readonly ISettingsService _settingsService = settingsService;
         public async Task<VectorCollectionDto> CreateVectorCollection(CreateVectorCollectionDto collection, IEnumerable<Models.File> files, CancellationToken ct = default)
         {
             var hasCreatedCollection = false;
@@ -93,7 +93,17 @@ namespace Bcs.Api.Services
         public async Task<IEnumerable<VectorCollectionDto>> GetVectorCollections(CancellationToken ct = default)
         {
             return await _vectorStoreService.GetCollections(ct);
-
         }
+
+        public async Task<SettingsDto> SaveSettings(SettingsDto dto, CancellationToken ct = default)
+        {
+            return await _settingsService.SaveSettings(dto, ct);
+        }
+
+        public async Task<SettingsDto> GetSettings(CancellationToken ct = default)
+        {
+            return await _settingsService.GetSettings(ct);
+        }
+
     }
 }
