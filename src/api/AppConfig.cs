@@ -5,6 +5,7 @@
         public OidcConfig? Oidc { get; set; }
         public QdrantConfig? Qdrant { get; set; }
         public MongoDbConfig? MongoDb { get; set; }
+        public GeminiConfig? Gemini { get; set; }
     }
 
     public class OidcConfig
@@ -30,5 +31,10 @@
         public required string Database { get; set; }
         public string? Username { get; set; }
         public string? Password { get; set; }
+    }
+
+    public class GeminiConfig
+    {
+        public required string ApiKey { get; set; }
     }
 }

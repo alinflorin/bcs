@@ -1,13 +1,15 @@
 ﻿using Bcs.Api.Dto;
+using Bcs.Api.Helpers;
 using Bcs.Api.Services.Interfaces;
 
 namespace Bcs.Api.Services
 {
-    public class AdminService(IVectorStoreService vectorStoreService, ITextExtractorService textExtractorService, AppConfig appConfig) : IAdminService
+    public class AdminService(IVectorStoreService vectorStoreService, ITextExtractorService textExtractorService, AppConfig appConfig, IEmbeddingService embeddingService) : IAdminService
     {
         private readonly IVectorStoreService _vectorStoreService = vectorStoreService;
         private readonly ITextExtractorService _textExtractorService = textExtractorService;
         private readonly AppConfig _appConfig = appConfig;
+        private readonly IEmbeddingService _embeddingService = embeddingService;
 
         public async Task<VectorCollectionDto> CreateCollection(CreateVectorCollectionDto collection, IEnumerable<Models.File> files, CancellationToken ct = default)
         {
@@ -21,35 +23,16 @@ namespace Bcs.Api.Services
 
             await _vectorStoreService.CreateCollection(collection.Name, ct);
 
-            var semaphore = new SemaphoreSlim(5);
-            var insertTasks = new List<Task>();
-
             foreach (var (fileName, text) in filesWithText)
             {
-                var chunks = ChunkText(text, 1000, 200);
+                var chunks = StringHelper.ChunkText(text, 1000, 200);
 
                 foreach (var chunk in chunks)
                 {
-                    await semaphore.WaitAsync(ct);
-
-                    var task = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            // TODO
-                        }
-                        finally
-                        {
-                            semaphore.Release();
-                        }
-                    }, ct);
-
-                    insertTasks.Add(task);
+                    var vectors = await _embeddingService.GetEmbedding(chunk, ct);
+                    // TODO
                 }
             }
-
-            // Step 4: Wait for all inserts to finish
-            await Task.WhenAll(insertTasks);
 
             return new VectorCollectionDto { Name = collection.Name };
         }
@@ -60,21 +43,6 @@ namespace Bcs.Api.Services
                 .Select(c => new VectorCollectionDto { Name = c })
                 .ToList();
 
-        }
-
-        private static IEnumerable<string> ChunkText(string text, int chunkSize, int overlap)
-        {
-            if (string.IsNullOrEmpty(text))
-                yield break;
-
-            for (int i = 0; i < text.Length; i += chunkSize - overlap)
-            {
-                var length = Math.Min(chunkSize, text.Length - i);
-                yield return text.Substring(i, length);
-
-                if (i + length >= text.Length)
-                    break;
-            }
         }
     }
 }
