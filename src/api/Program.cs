@@ -111,7 +111,7 @@ public class Program
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsJsonAsync(new Dictionary<string, string[]>
                 {
-                    {"", [ exceptionHandlerPathFeature == null ? "api.exception.fatalError" : exceptionHandlerPathFeature!.Error.Message + (app.Environment.IsDevelopment() ? " - " + exceptionHandlerPathFeature!.Error.StackTrace : "") ] }
+                    {"", [ exceptionHandlerPathFeature == null ? "api.exception.fatalError" : exceptionHandlerPathFeature!.Error.Message ] }
                 });
             });
         });
