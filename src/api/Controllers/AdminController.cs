@@ -31,7 +31,7 @@ namespace Bcs.Api.Controllers
         {
             using var ms = new MemoryStream(Encoding.UTF8.GetBytes(model.CreateVectorCollectionDtoString));
             var dto = await JsonSerializer.DeserializeAsync<CreateVectorCollectionDto>(ms, JsonHelper.GetOptions(), cancellationToken: HttpContext.RequestAborted);
-            if (dto == null)
+            if (dto == null || model.PdfFiles == null)
             {
                 return BadRequest(new Dictionary<string, string[]> {
                     {"", ["api.validation.invalidRequest"] }
@@ -42,9 +42,19 @@ namespace Bcs.Api.Controllers
             {
                 return BadRequest(validationResult.ToDictionary());
             }
+
+            var goodFiles = model.PdfFiles.Where(x => x.Length > 0 && x.ContentType.ToLower() == "application/pdf").ToList();
+
+            if (goodFiles.Count == 0)
+            {
+                return BadRequest(new Dictionary<string, string[]> {
+                    {"", ["api.validation.invalidRequest"] }
+                });
+            }
+
             var files = new List<Models.File>();
 
-            foreach (var pdfFile in model.PdfFiles)
+            foreach (var pdfFile in goodFiles)
             {
                 files.Add(new Models.File
                 {
