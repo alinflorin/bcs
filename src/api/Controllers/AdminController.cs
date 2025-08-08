@@ -27,9 +27,9 @@ namespace Bcs.Api.Controllers
 
         [HttpPost("vector-collections")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateVectorCollection([FromForm] string createVectorCollectionDtoString, [FromForm] List<IFormFile> pdfFiles)
+        public async Task<IActionResult> CreateVectorCollection([FromForm] CreateVectorCollectionFormModel model)
         {
-            using var ms = new MemoryStream(Encoding.UTF8.GetBytes(createVectorCollectionDtoString));
+            using var ms = new MemoryStream(Encoding.UTF8.GetBytes(model.CreateVectorCollectionDtoString));
             var dto = await JsonSerializer.DeserializeAsync<CreateVectorCollectionDto>(ms, JsonHelper.GetOptions(), cancellationToken: HttpContext.RequestAborted);
             if (dto == null)
             {
@@ -44,7 +44,7 @@ namespace Bcs.Api.Controllers
             }
             var files = new List<Models.File>();
 
-            foreach (var pdfFile in pdfFiles)
+            foreach (var pdfFile in model.PdfFiles)
             {
                 files.Add(new Models.File
                 {
