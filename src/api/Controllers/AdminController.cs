@@ -52,15 +52,18 @@ namespace Bcs.Api.Controllers
                     FileName = pdfFile.FileName
                 });
             }
-
-            var serviceResponse = await _adminService.CreateVectorCollection(dto, files, HttpContext.RequestAborted);
-
-            foreach (var file in files)
+            try
             {
-                file.Content.Close();
+                var serviceResponse = await _adminService.CreateVectorCollection(dto, files, HttpContext.RequestAborted);
+                return Ok(serviceResponse);
             }
-
-            return Ok(serviceResponse);
+            finally
+            {
+                foreach (var file in files)
+                {
+                    file.Content.Close();
+                }
+            }
         }
 
         [HttpDelete("vector-collections/{collectionName}")]

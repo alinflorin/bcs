@@ -17,13 +17,14 @@ namespace Bcs.Api.Services
             var hasCreatedCollection = false;
             try
             {
-                var extractionTasks = files.Select(async file =>
-                {
-                    var text = await _textExtractorService.ConvertPdfToText(file.Content, ct);
-                    return (file.FileName, text);
-                });
+                var extractionTasks = files
+                    .Select(file => (Func<Task<(string FileName, string Text)>>)(async () =>
+                    {
+                        var text = await _textExtractorService.ConvertPdfToText(file.Content, ct);
+                        return (file.FileName, text);
+                    }));
 
-                var filesWithText = await Task.WhenAll(extractionTasks);
+                var filesWithText = await extractionTasks.WhenAllLimited(3, ct);
 
                 var points = new List<VectorPoint>();
 
@@ -31,14 +32,14 @@ namespace Bcs.Api.Services
                 {
                     var chunks = StringHelper.ChunkText(text, 1000, 200);
                     var batchedChunks = chunks.Batch(100);
-                    var embeddingTasks = batchedChunks.Select(async b => {
-                        return await _embeddingService.GetEmbeddings(b, ct);
-                    });
-                    var embeddingResults = await Task.WhenAll(embeddingTasks);
+                    var embeddingTasks = batchedChunks
+                        .Select(batch => (Func<Task<IEnumerable<float[]>>>)(() => _embeddingService.GetEmbeddings(batch, ct)));
+
+                    var embeddingResults = await embeddingTasks.WhenAllLimited(5, ct);
 
                     var chunkId = 0;
                     var id = 0;
-                    for (var i = 0; i < embeddingResults.Length; i++)
+                    for (var i = 0; i < embeddingResults.Count; i++)
                     {
                         var batchResults = embeddingResults[i];
                         for (var j = 0; j < batchResults.Count(); j++)
