@@ -92,9 +92,7 @@ namespace Bcs.Api.Services
 
         public async Task<IEnumerable<VectorCollectionDto>> GetVectorCollections(CancellationToken ct = default)
         {
-            return (await _vectorStoreService.GetCollections(ct))
-                .Select(c => new VectorCollectionDto { Name = c })
-                .ToList();
+            return await _vectorStoreService.GetCollections(ct);
 
         }
     }

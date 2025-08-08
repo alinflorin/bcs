@@ -1,4 +1,5 @@
-﻿using Bcs.Api.Models;
+﻿using Bcs.Api.Dto;
+using Bcs.Api.Models;
 using Bcs.Api.Services.Interfaces;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
@@ -35,9 +36,21 @@ namespace Bcs.Api.Services
             await _qdrantClient.DeleteCollectionAsync(name, cancellationToken: ct);
         }
 
-        public async Task<IEnumerable<string>> GetCollections(CancellationToken ct = default)
+        public async Task<IEnumerable<VectorCollectionDto>> GetCollections(CancellationToken ct = default)
         {
-            return await _qdrantClient.ListCollectionsAsync(ct);
+            var colNames = await _qdrantClient.ListCollectionsAsync(ct);
+            var infoTasks = colNames.Select(c => (Func<Task<CollectionInfo>>)(() => _qdrantClient.GetCollectionInfoAsync(c, ct)));
+            var infos = await infoTasks.WhenAllLimited(10, ct);
+            var dtos = new List<VectorCollectionDto>();
+            for (var i = 0; i < colNames.Count; i++)
+            {
+                var dto = new VectorCollectionDto { 
+                    Name = colNames[i],
+                    PointsCount = infos[i].PointsCount
+                };
+                dtos.Add(dto);
+            }
+            return dtos;
         }
 
         public async Task<bool> Healthcheck(CancellationToken ct = default)

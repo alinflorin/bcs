@@ -3,5 +3,6 @@
     public class VectorCollectionDto
     {
         public required string Name { get; set; }
+        public ulong? PointsCount { get; set; }
     }
 }
