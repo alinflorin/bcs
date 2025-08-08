@@ -8,7 +8,7 @@ namespace Bcs.Api.Services
 {
     public class PdfPigTextExtractorService : ITextExtractorService
     {
-        public async Task<string> ConvertPdfToText(Stream pdfBinary)
+        public async Task<string> ConvertPdfToText(Stream pdfBinary, CancellationToken ct = default)
         {
             var sb = new StringBuilder();
             using (var pdfDocument = PdfDocument.Open(pdfBinary, new ParsingOptions { UseLenientParsing = true }))

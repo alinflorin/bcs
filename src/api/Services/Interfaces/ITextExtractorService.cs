@@ -2,6 +2,6 @@
 {
     public interface ITextExtractorService
     {
-        Task<string> ConvertPdfToText(Stream pdfBinary);
+        Task<string> ConvertPdfToText(Stream pdfBinary, CancellationToken ct = default);
     }
 }
