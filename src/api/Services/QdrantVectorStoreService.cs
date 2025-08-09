@@ -36,6 +36,12 @@ namespace Bcs.Api.Services
             await _qdrantClient.DeleteCollectionAsync(name, cancellationToken: ct);
         }
 
+        public async Task<VectorCollectionDto> GetCollection(string name, CancellationToken ct = default)
+        {
+            var info = await _qdrantClient.GetCollectionInfoAsync(name, ct);
+            return new VectorCollectionDto { Name = name, PointsCount = info.PointsCount };
+        }
+
         public async Task<IEnumerable<VectorCollectionDto>> GetCollections(CancellationToken ct = default)
         {
             var colNames = await _qdrantClient.ListCollectionsAsync(ct);

@@ -9,6 +9,7 @@ import {provideTranslateHttpLoader} from "@ngx-translate/http-loader";
 import { config } from './config';
 import { LocalStorageOidcStorageService } from './services/local-storage-oidc-storage.service';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,6 +26,7 @@ export const appConfig: ApplicationConfig = {
       fallbackLang: config.defaultLanguage,
       lang: config.defaultLanguage
     }),
-    importProvidersFrom(MatSnackBarModule)
+    importProvidersFrom(MatSnackBarModule),
+    importProvidersFrom(MatDialogModule)
   ]
 };

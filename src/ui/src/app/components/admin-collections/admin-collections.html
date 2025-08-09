@@ -1,58 +1,92 @@
 <div id="collections-page">
   <div id="collections-list">
     @if (!collections() || collections()!.length === 0) {
-      <p>{{'ui.components.admin-collections.noCollections' | translate}}</p>
-    } @else {
-      @for (collection of collections(); track collection) {
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>{{collection.name}}</mat-card-title>
-            <mat-card-subtitle>{{ collection.pointsCount }}</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-footer>
-            <mat-card-actions>
-              <button (click)="deleteCollection(collection.name)" mat-icon-button>
-                <mat-icon>delete_forever</mat-icon>
-              </button>
-            </mat-card-actions>
-          </mat-card-footer>
-        </mat-card>
-      }
-    }
+    <p>{{ "ui.components.admin-collections.noCollections" | translate }}</p>
+    } @else { @for (collection of collections(); track collection) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ collection.name }}</mat-card-title>
+        <mat-card-subtitle>{{ collection.pointsCount }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-footer>
+        <mat-card-actions>
+          <button (click)="deleteCollection(collection.name)" mat-icon-button>
+            <mat-icon>delete_forever</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card-footer>
+    </mat-card>
+    } }
   </div>
-  <div>
+  <div id="add-collection">
     <form [formGroup]="form" (ngSubmit)="addCollection()">
-      @if (form.hasError('backend')) { @for (be of form.getError('backend');
-      track be) {
+      @if (form.touched) { @if (form.hasError('backend')) { @for (be of
+      form.getError('backend'); track be) {
       <mat-error>
         {{ be | translate }}
       </mat-error>
-      } }
+      } }}
       <mat-form-field appearance="fill" class="full-width">
         <mat-label>{{
           "ui.components.admin-collections.name" | translate
         }}</mat-label>
         <input matInput formControlName="name" type="text" required />
-        @if (form.get('name')!.hasError('required')) {
+        @if (form.get('name')!.touched) { @if
+        (form.get('name')!.hasError('required')) {
         <mat-error>
           {{ "ui.validation.required" | translate }}
         </mat-error>
-        }
-        @if (form.get('name')!.hasError('backend')) {
-          @for (be of form.get('name')!.getError('backend'); track be) {
+        } @if (form.get('name')!.hasError('backend')) { @for (be of
+        form.get('name')!.getError('backend'); track be) {
         <mat-error>
           {{ be | translate }}
         </mat-error>
-        } }
+        } } }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{
+          "ui.components.admin-collections.files" | translate
+        }}</mat-label>
+        <input type="text" matInput [hidden]="true" />
+        <mat-file-upload
+          [labelText]="
+            'ui.components.admin-collections.selectFilesToUpload' | translate
+          "
+          [selectButtonText]="
+            'ui.components.admin-collections.chooseFiles' | translate
+          "
+          selectFilesButtonType="button"
+          uploadButtonType="submit"
+          [allowMultipleFiles]="true"
+          [showUploadButton]="false"
+          [acceptedTypes]="'.pdf'"
+          (selectedFilesChanged)="onSelectedFilesChanged($event)"
+        >
+        </mat-file-upload>
+        @if (form.get('files')!.touched) {
+        @if (form.get('files')!.hasError('minFiles')) {
+        <mat-error>
+          {{ "ui.validation.required" | translate }}
+        </mat-error>
+        } @if (form.get('files')!.hasError('backend')) { @for (be of
+        form.get('files')!.getError('backend'); track be) {
+        <mat-error>
+          {{ be | translate }}
+        </mat-error>
+        } } }
       </mat-form-field>
 
       <button
         mat-raised-button
-        color="primary"
         type="submit"
-        [disabled]="form.invalid"
+        [disabled]="form.invalid || isLoading()"
       >
-        {{ "ui.components.admin-collections.save" | translate }}
+        @if (isLoading()) {
+          <mat-spinner [diameter]="20"></mat-spinner>
+        } @else {
+          <span>{{ "ui.components.admin-collections.save" | translate }}</span>
+        }
       </button>
     </form>
   </div>

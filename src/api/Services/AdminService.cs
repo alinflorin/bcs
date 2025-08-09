@@ -65,7 +65,9 @@ namespace Bcs.Api.Services
 
                 await _vectorStoreService.UpsertPoints(collection.Name, points, ct);
 
-                return new VectorCollectionDto { Name = collection.Name };
+                var colInfo = await _vectorStoreService.GetCollection(collection.Name, ct);
+
+                return colInfo;
             } catch (Exception)
             {
                 if (hasCreatedCollection)

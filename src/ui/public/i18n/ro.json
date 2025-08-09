@@ -10,19 +10,28 @@
   "ui": {
     "components": {
       "admin-collections": {
+        "chooseFiles": "Alegeți fișiere",
         "collectionAdded": "Colecție adăugată",
         "collectionDeleted": "Colecție ștearsă",
         "errorAddingCollection": "Eroare la adăugarea colecției",
         "errorDeletingCollection": "Eroare la ștergerea colecției",
+        "files": "Fișiere",
         "name": "Name",
         "noCollections": "Nicio colecție",
-        "save": "Salvare"
+        "save": "Salvare",
+        "selectFilesToUpload": "Selectare fișiere pentru upload"
       },
       "admin-settings": {
         "errorSavingSettings": "Eroare la salvarea setărilor",
         "save": "Salvare",
         "settingsSaved": "Setări salvate",
         "systemPrompt": "Prompt de sistem"
+      },
+      "confirmation": {
+        "areYouSure": "Sunteți sigur?",
+        "areYouSureYouWantToPerformThisAction": "Sunteți sigur că doriți să executați această acțiune?",
+        "no": "Nu",
+        "yes": "Da"
       }
     },
     "layout": {

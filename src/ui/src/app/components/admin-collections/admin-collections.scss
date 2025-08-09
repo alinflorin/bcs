@@ -13,5 +13,12 @@
       gap: 1rem;
       overflow: auto;
     }
+
+    #add-collection {
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+    }
   }
 }

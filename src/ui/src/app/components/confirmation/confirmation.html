@@ -1,0 +1,8 @@
+<h2 mat-dialog-title>{{ data.title || ('ui.components.confirmation.areYouSure' | translate) }}</h2>
+<mat-dialog-content class="mat-typography">
+  <p>{{ data.message || ('ui.components.confirmation.areYouSureYouWantToPerformThisAction' | translate) }}</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button matButton mat-dialog-close>{{'ui.components.confirmation.no' | translate}}</button>
+  <button matButton [mat-dialog-close]="true" cdkFocusInitial>{{'ui.components.confirmation.yes' | translate}}</button>
+</mat-dialog-actions>

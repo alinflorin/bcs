@@ -1,29 +1,34 @@
 <form [formGroup]="form" (ngSubmit)="save()">
-  @if (form.hasError('backend')) {
-    @for (be of form.getError('backend'); track be) {
+  @if (form.touched) { @if (form.hasError('backend')) { @for (be of
+  form.getError('backend'); track be) {
+  <mat-error>
+    {{ be | translate }}
+  </mat-error>
+  } } }
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>{{
+      "ui.components.admin-settings.systemPrompt" | translate
+    }}</mat-label>
+    <textarea required matInput formControlName="systemPrompt"></textarea>
+    @if (form.get('systemPrompt')!.touched) { @if
+    (form.get('systemPrompt')!.hasError('required')) {
+    <mat-error>
+      {{ "ui.validation.required" | translate }}
+    </mat-error>
+    } @if (form.get('systemPrompt')!.hasError('backend')) { @for (be of
+    form.get('systemPrompt')!.getError('backend'); track be) {
     <mat-error>
       {{ be | translate }}
     </mat-error>
-    }
-  }
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>{{ 'ui.components.admin-settings.systemPrompt' | translate }}</mat-label>
-    <textarea required matInput formControlName="systemPrompt"></textarea>
-    @if (form.get('systemPrompt')!.hasError('required')) {
-    <mat-error>
-      {{ 'ui.validation.required' | translate }}
-    </mat-error>
-    }
-    @if (form.get('systemPrompt')!.hasError('backend')) {
-      @for (be of form.get('systemPrompt')!.getError('backend'); track be) {
-      <mat-error>
-        {{ be | translate }}
-      </mat-error>
-      }
-    }
+    } } }
   </mat-form-field>
 
-  <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-    {{ 'ui.components.admin-settings.save' | translate }}
+  <button
+    mat-raised-button
+    color="primary"
+    type="submit"
+    [disabled]="form.invalid"
+  >
+    {{ "ui.components.admin-settings.save" | translate }}
   </button>
 </form>

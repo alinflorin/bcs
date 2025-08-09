@@ -10,19 +10,28 @@
   "ui": {
     "components": {
       "admin-collections": {
+        "chooseFiles": "Choose files",
         "collectionAdded": "Collection added",
         "collectionDeleted": "Collection deleted",
         "errorAddingCollection": "Error adding collection",
         "errorDeletingCollection": "Error deleting collection",
+        "files": "Files",
         "name": "Name",
         "noCollections": "No collections",
-        "save": "Save"
+        "save": "Save",
+        "selectFilesToUpload": "Select files to upload"
       },
       "admin-settings": {
         "errorSavingSettings": "Error saving settings",
         "save": "Save",
         "settingsSaved": "Settings saved",
         "systemPrompt": "System Prompt"
+      },
+      "confirmation": {
+        "areYouSure": "Are you sure?",
+        "areYouSureYouWantToPerformThisAction": "Are you sure you want to perform this action?",
+        "no": "No",
+        "yes": "Yes"
       }
     },
     "layout": {

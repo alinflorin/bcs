@@ -11,5 +11,6 @@ namespace Bcs.Api.Services.Interfaces
         Task CreateCollection(string name, CancellationToken ct = default);
         Task UpsertPoints(string collectionName, IEnumerable<VectorPoint> points, CancellationToken ct = default);
         Task DeleteCollection(string name, CancellationToken ct = default);
+        Task<VectorCollectionDto> GetCollection(string name, CancellationToken ct = default);
     }
 }

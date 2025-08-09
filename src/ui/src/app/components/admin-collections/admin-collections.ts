@@ -19,6 +19,9 @@ import { setErrorDtoInFormValidation } from '../../helpers/form-validation.helpe
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { VectorCollectionDto } from '../../dto/vector-collection.dto';
+import { MatFileUploadModule } from 'mat-file-upload';
+import { ConfirmationService } from '../../services/confirmation.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-admin-collections',
@@ -30,6 +33,8 @@ import { VectorCollectionDto } from '../../dto/vector-collection.dto';
     MatFormFieldModule,
     MatCardModule,
     MatIconModule,
+    MatFileUploadModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './admin-collections.html',
   styleUrl: './admin-collections.scss',
@@ -38,8 +43,10 @@ export class AdminCollections implements OnInit {
   private readonly adminService = inject(AdminService);
   private readonly toastService = inject(ToastService);
   private readonly translateService = inject(TranslateService);
+  private readonly confirmationService = inject(ConfirmationService);
 
   collections = signal<VectorCollectionDto[] | undefined>(undefined);
+  isLoading = signal(false);
 
   form = new FormGroup({
     name: new FormControl<string>('', [Validators.required]),
@@ -53,44 +60,67 @@ export class AdminCollections implements OnInit {
   }
 
   deleteCollection(name: string) {
-    this.adminService.deleteVectorCollection(name).subscribe({
-      next: () => {
-        this.toastService.show(
-          this.translateService.instant(
-            'ui.components.admin-collections.collectionDeleted'
-          ),
-          'success'
-        );
-        const newList = this.collections()!.filter((x) => x.name !== name);
-        this.collections.set(newList);
-      },
-      error: () => {
-        this.toastService.show(
-          this.translateService.instant(
-            'ui.components.admin-collections.errorDeletingCollection'
-          ),
-          'error'
-        );
-      },
+    this.confirmationService.confirm().subscribe((x) => {
+      if (!x) {
+        return;
+      }
+      this.adminService.deleteVectorCollection(name).subscribe({
+        next: () => {
+          this.toastService.show(
+            this.translateService.instant(
+              'ui.components.admin-collections.collectionDeleted'
+            ),
+            'success'
+          );
+          const newList = this.collections()!.filter((x) => x.name !== name);
+          this.collections.set(newList);
+        },
+        error: () => {
+          this.toastService.show(
+            this.translateService.instant(
+              'ui.components.admin-collections.errorDeletingCollection'
+            ),
+            'error'
+          );
+        },
+      });
     });
   }
 
+  onSelectedFilesChanged(files: FileList) {
+    this.form.get('files')!.markAsTouched();
+    if (files == null) {
+      this.form.get('files')!.setValue([]);
+      return;
+    }
+    const filesArr: File[] = [];
+    for (let i = 0; i < files.length; i++) {
+      filesArr.push(files.item(i)!);
+    }
+    this.form.get('files')!.setValue(filesArr);
+  }
+
   addCollection() {
+    this.isLoading.set(true);
     this.adminService
       .createVectorCollection(
         { name: this.form.value.name! } as CreateVectorCollectionDto,
         this.form.value.files!
       )
       .subscribe({
-        next: () => {
+        next: (c) => {
+          this.isLoading.set(false);
           this.toastService.show(
             this.translateService.instant(
               'ui.components.admin-collections.collectionAdded'
             ),
             'success'
           );
+          const newList = [...this.collections()!, c];
+          this.collections.set(newList);
         },
         error: (e) => {
+          this.isLoading.set(false);
           if (e instanceof HttpErrorResponse) {
             const errors: ErrorDto = e.error;
             setErrorDtoInFormValidation(this.form, errors);
