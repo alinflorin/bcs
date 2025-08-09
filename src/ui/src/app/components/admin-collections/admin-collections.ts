@@ -16,7 +16,6 @@ import { CreateVectorCollectionDto } from '../../dto/create-vector-collection.dt
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorDto } from '../../dto/error.dto';
 import { setErrorDtoInFormValidation } from '../../helpers/form-validation.helper';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { VectorCollectionDto } from '../../dto/vector-collection.dto';
