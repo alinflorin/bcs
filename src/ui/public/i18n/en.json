@@ -8,6 +8,14 @@
     }
   },
   "ui": {
+    "components": {
+      "admin-settings": {
+        "errorSavingSettings": "Error saving settings",
+        "save": "Save",
+        "settingsSaved": "Settings saved",
+        "systemPrompt": "System Prompt"
+      }
+    },
     "layout": {
       "header": {
         "about": "About",
@@ -36,6 +44,9 @@
       "oauth-callback": {
         "loading": "Loading"
       }
+    },
+    "validation": {
+      "required": "This field is required"
     }
   }
 }

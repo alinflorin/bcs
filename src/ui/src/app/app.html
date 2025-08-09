@@ -10,5 +10,5 @@
   <div id="content">
     <router-outlet />
   </div>
-  <app-footer [apiVersion]="apiVersion()"></app-footer>
+  <app-footer [apiVersion]="apiVersion()?.version || '?'"></app-footer>
 </div>

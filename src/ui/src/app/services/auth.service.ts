@@ -13,7 +13,7 @@ export class AuthService {
     return this.oidc.checkAuth();
   }
 
-  get user(): Observable<UserClaims | undefined> {
+  get user() {
     return this.oidc.getUserData().pipe(
       switchMap(u => {
         if (!u) {

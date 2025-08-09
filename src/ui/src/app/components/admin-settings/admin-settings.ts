@@ -1,11 +1,18 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { Component, effect, inject } from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AdminService } from '../../services/admin.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ToastService } from '../../services/toast.service';
+import { SettingsDto } from '../../dto/settings.dto';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-admin-settings',
@@ -19,9 +26,50 @@ import { ToastService } from '../../services/toast.service';
   templateUrl: './admin-settings.html',
   styleUrl: './admin-settings.scss',
 })
-export class AdminSettings implements OnInit {
+export class AdminSettings {
   private readonly adminService = inject(AdminService);
   private readonly toastService = inject(ToastService);
+  private readonly translateService = inject(TranslateService);
 
-  ngOnInit(): void {}
+  settings = toSignal(this.adminService.getSettings());
+  formLoaded = false;
+
+  form = new FormGroup({
+    systemPrompt: new FormControl<string>('', [Validators.required]),
+  });
+
+  constructor() {
+    effect(() => {
+      const settingsValue = this.settings();
+      if (!settingsValue) {
+        return;
+      }
+      if (!this.formLoaded) {
+        this.form.setValue(settingsValue);
+        this.formLoaded = true;
+        return;
+      }
+    });
+  }
+
+  save() {
+    this.adminService.saveSettings(this.form.value as SettingsDto).subscribe({
+      next: (r) => {
+        this.toastService.show(
+          this.translateService.instant(
+            'ui.components.admin-settings.settingsSaved'
+          ),
+          'success'
+        );
+      },
+      error: () => {
+        this.toastService.show(
+          this.translateService.instant(
+            'ui.components.admin-settings.errorSavingSettings'
+          ),
+          'error'
+        );
+      },
+    });
+  }
 }

@@ -34,7 +34,7 @@ export class AdminService {
   }
 
   deleteVectorCollection(name: string) {
-    return this.http.delete<VectorCollectionDto>(`/api/admin/vector-collections/${name}`)
+    return this.http.delete<VectorCollectionDto>(`/api/admin/vector-collections/${name}`);
   }
 
   getSettings() {

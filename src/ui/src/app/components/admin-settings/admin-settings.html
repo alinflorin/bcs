@@ -1,1 +1,15 @@
-<p>admin-settings works!</p>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>{{ 'ui.components.admin-settings.systemPrompt' | translate }}</mat-label>
+    <textarea matInput formControlName="systemPrompt"></textarea>
+    @if (form.get('systemPrompt')?.hasError('required')) {
+    <mat-error>
+      {{ 'ui.validation.required' | translate }}
+    </mat-error>
+    }
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+    {{ 'ui.components.admin-settings.save' | translate }}
+  </button>
+</form>

@@ -8,7 +8,7 @@ namespace Bcs.Api.Validators
     {
         public IActionResult CreateActionResult(ActionExecutingContext context, ValidationProblemDetails? validationProblemDetails)
         {
-            return new BadRequestObjectResult(validationProblemDetails?.Errors);
+            return new BadRequestObjectResult(validationProblemDetails?.Errors.ToDictionary(x => x.Key.ToCamelCase(), x => x.Value));
         }
     }
 }

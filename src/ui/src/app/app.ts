@@ -4,9 +4,9 @@ import { Header } from './layout/header/header';
 import { Footer } from './layout/footer/footer';
 import { ApiService } from './services/api.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { UserClaims } from './models/user-claims';
 import { config } from './config';
 import { AuthService } from './services/auth.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
@@ -18,24 +18,15 @@ export class App implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly apiService = inject(ApiService);
   private readonly translate = inject(TranslateService);
-  apiVersion = signal('?');
+  apiVersion = toSignal(this.apiService.getApiVersion());
 
-  user = signal<UserClaims | undefined>(undefined);
+  user = toSignal(this.authService.user);
 
   theme = signal('auto');
 
   ngOnInit(): void {
     // Auth
     this.authService.checkAuth().subscribe();
-
-    this.authService.user.subscribe(u => {
-      this.user.set(u);
-    });
-
-    // Get API version
-    this.apiService.getApiVersion().subscribe(r => {
-      this.apiVersion.set(r.version);
-    });
 
     // Translate
     this.translate.addLangs(config.languages.map(x => x.code));

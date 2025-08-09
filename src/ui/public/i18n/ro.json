@@ -8,6 +8,14 @@
     }
   },
   "ui": {
+    "components": {
+      "admin-settings": {
+        "errorSavingSettings": "Eroare la salvarea setărilor",
+        "save": "Salvare",
+        "settingsSaved": "Setări salvate",
+        "systemPrompt": "Prompt de sistem"
+      }
+    },
     "layout": {
       "header": {
         "about": "Despre",
@@ -36,6 +44,9 @@
       "oauth-callback": {
         "loading": "Se încarcă"
       }
+    },
+    "validation": {
+      "required": "Acest câmp este obligatoriu"
     }
   }
 }

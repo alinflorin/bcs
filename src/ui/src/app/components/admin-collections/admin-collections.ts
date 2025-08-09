@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AdminService } from '../../services/admin.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -22,10 +22,9 @@ import { ToastService } from '../../services/toast.service';
 export class AdminCollections implements OnInit {
   private readonly adminService = inject(AdminService);
   private readonly toastService = inject(ToastService);
+  private readonly translateService = inject(TranslateService);
 
   ngOnInit(): void {}
 
-  test() {
-    this.toastService.show('adsasd', 'error');
-  }
+
 }
