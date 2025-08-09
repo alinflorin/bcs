@@ -9,6 +9,15 @@
   },
   "ui": {
     "components": {
+      "admin-collections": {
+        "collectionAdded": "Collection added",
+        "collectionDeleted": "Collection deleted",
+        "errorAddingCollection": "Error adding collection",
+        "errorDeletingCollection": "Error deleting collection",
+        "name": "Name",
+        "noCollections": "No collections",
+        "save": "Save"
+      },
       "admin-settings": {
         "errorSavingSettings": "Error saving settings",
         "save": "Save",

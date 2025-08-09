@@ -1,1 +1,59 @@
-<p>admin-collections works!</p>
+<div id="collections-page">
+  <div id="collections-list">
+    @if (!collections() || collections()!.length === 0) {
+      <p>{{'ui.components.admin-collections.noCollections' | translate}}</p>
+    } @else {
+      @for (collection of collections(); track collection) {
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>{{collection.name}}</mat-card-title>
+            <mat-card-subtitle>{{ collection.pointsCount }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-footer>
+            <mat-card-actions>
+              <button (click)="deleteCollection(collection.name)" mat-icon-button>
+                <mat-icon>delete_forever</mat-icon>
+              </button>
+            </mat-card-actions>
+          </mat-card-footer>
+        </mat-card>
+      }
+    }
+  </div>
+  <div>
+    <form [formGroup]="form" (ngSubmit)="addCollection()">
+      @if (form.hasError('backend')) { @for (be of form.getError('backend');
+      track be) {
+      <mat-error>
+        {{ be | translate }}
+      </mat-error>
+      } }
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>{{
+          "ui.components.admin-collections.name" | translate
+        }}</mat-label>
+        <textarea matInput formControlName="name"></textarea>
+        @if (form.get('name')!.hasError('required')) {
+        <mat-error>
+          {{ "ui.validation.required" | translate }}
+        </mat-error>
+        }
+        @if (form.get('name')!.hasError('backend')) {
+          @for (be of form.get('name')!.getError('backend'); track be) {
+        <mat-error>
+          {{ be | translate }}
+        </mat-error>
+        } }
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="form.invalid"
+      >
+        {{ "ui.components.admin-collections.save" | translate }}
+      </button>
+    </form>
+  </div>
+</div>

@@ -13,6 +13,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { ToastService } from '../../services/toast.service';
 import { SettingsDto } from '../../dto/settings.dto';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ErrorDto } from '../../dto/error.dto';
+import { setErrorDtoInFormValidation } from '../../helpers/form-validation.helper';
 
 @Component({
   selector: 'app-admin-settings',
@@ -54,7 +57,7 @@ export class AdminSettings {
 
   save() {
     this.adminService.saveSettings(this.form.value as SettingsDto).subscribe({
-      next: (r) => {
+      next: () => {
         this.toastService.show(
           this.translateService.instant(
             'ui.components.admin-settings.settingsSaved'
@@ -62,13 +65,18 @@ export class AdminSettings {
           'success'
         );
       },
-      error: () => {
-        this.toastService.show(
-          this.translateService.instant(
-            'ui.components.admin-settings.errorSavingSettings'
-          ),
-          'error'
-        );
+      error: (e) => {
+        if (e instanceof HttpErrorResponse) {
+          const errors: ErrorDto = e.error;
+          setErrorDtoInFormValidation(this.form, errors);
+        } else {
+          this.toastService.show(
+            this.translateService.instant(
+              'ui.components.admin-settings.errorSavingSettings'
+            ),
+            'error'
+          );
+        }
       },
     });
   }

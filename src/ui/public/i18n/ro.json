@@ -9,6 +9,15 @@
   },
   "ui": {
     "components": {
+      "admin-collections": {
+        "collectionAdded": "Colecție adăugată",
+        "collectionDeleted": "Colecție ștearsă",
+        "errorAddingCollection": "Eroare la adăugarea colecției",
+        "errorDeletingCollection": "Eroare la ștergerea colecției",
+        "name": "Name",
+        "noCollections": "Nicio colecție",
+        "save": "Salvare"
+      },
       "admin-settings": {
         "errorSavingSettings": "Eroare la salvarea setărilor",
         "save": "Salvare",
