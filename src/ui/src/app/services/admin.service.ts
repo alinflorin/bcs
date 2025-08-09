@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { VectorCollectionDto } from '../dto/vector-collection.dto';
 import { CreateVectorCollectionDto } from '../dto/create-vector-collection.dto';
+import { SettingsDto } from '../dto/settings.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -34,5 +35,13 @@ export class AdminService {
 
   deleteVectorCollection(name: string) {
     return this.http.delete<VectorCollectionDto>(`/api/admin/vector-collections/${name}`)
+  }
+
+  getSettings() {
+    return this.http.get<SettingsDto>(`/api/admin/settings`);
+  }
+
+  saveSettings(dto: SettingsDto) {
+    return this.http.put<SettingsDto>(`/api/admin/settings`, dto);
   }
 }
