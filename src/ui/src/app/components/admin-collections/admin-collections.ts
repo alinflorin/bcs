@@ -74,6 +74,8 @@ export class AdminCollections implements OnInit {
           );
           const newList = this.collections()!.filter((x) => x.name !== name);
           this.collections.set(newList);
+          this.form.get('files')!.setValue([]);
+          this.form.reset();
         },
         error: () => {
           this.toastService.show(
