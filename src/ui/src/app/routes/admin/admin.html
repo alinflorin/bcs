@@ -1,1 +1,6 @@
-<p>admin works!</p>
+<mat-tab-group>
+  <mat-tab [label]="'ui.routes.admin.collections' | translate"
+    ><app-admin-collections></app-admin-collections
+  ></mat-tab>
+  <mat-tab [label]="'ui.routes.admin.settings' | translate"><app-admin-settings></app-admin-settings></mat-tab>
+</mat-tab-group>

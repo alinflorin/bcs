@@ -25,6 +25,10 @@
       }
     },
     "routes": {
+      "admin": {
+        "collections": "Colecții",
+        "settings": "Setări"
+      },
       "not-found": {
         "goHome": "Navighează acasă",
         "notFound": "Negăsit"

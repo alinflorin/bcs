@@ -25,6 +25,10 @@
       }
     },
     "routes": {
+      "admin": {
+        "collections": "Collections",
+        "settings": "Settings"
+      },
       "not-found": {
         "goHome": "Go Home",
         "notFound": "Not Found"
