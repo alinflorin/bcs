@@ -20,6 +20,11 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: 'GEMINI__APIKEY'
+              valueFrom:
+                secretKeyRef:
+                  name: bcs
+                  key: geminiApiKey
             - name: 'QDRANT__APIKEY'
               valueFrom:
                 secretKeyRef:

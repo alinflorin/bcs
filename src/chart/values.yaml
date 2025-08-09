@@ -92,3 +92,4 @@ secrets:
   qdrantReadWriteApiKey: null
   qdrantReadOnlyApiKey: null
   mongodbPassword: null
+  geminiApiKey: null
