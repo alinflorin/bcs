@@ -8,7 +8,7 @@
   }
   <mat-form-field appearance="fill" class="full-width">
     <mat-label>{{ 'ui.components.admin-settings.systemPrompt' | translate }}</mat-label>
-    <textarea matInput formControlName="systemPrompt"></textarea>
+    <textarea required matInput formControlName="systemPrompt"></textarea>
     @if (form.get('systemPrompt')!.hasError('required')) {
     <mat-error>
       {{ 'ui.validation.required' | translate }}

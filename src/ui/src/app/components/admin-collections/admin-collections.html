@@ -32,7 +32,7 @@
         <mat-label>{{
           "ui.components.admin-collections.name" | translate
         }}</mat-label>
-        <textarea matInput formControlName="name"></textarea>
+        <input matInput formControlName="name" type="text" required />
         @if (form.get('name')!.hasError('required')) {
         <mat-error>
           {{ "ui.validation.required" | translate }}
