@@ -1,16 +1,17 @@
 {
   "api": {
     "validation": {
-      "required": "Required",
       "alreadyExists": "Already exists",
       "fatalError": "Fatal error",
-      "invalidRequest": "Invalid request"
+      "invalidRequest": "Invalid request",
+      "required": "Required"
     }
   },
   "ui": {
     "layout": {
       "header": {
         "about": "About",
+        "admin": "Admin",
         "language": "Language",
         "login": "Login",
         "logout": "Logout",
@@ -18,18 +19,18 @@
         "theme": "Theme",
         "themes": {
           "auto": "Auto",
-          "light": "Light",
-          "dark": "Dark"
+          "dark": "Dark",
+          "light": "Light"
         }
       }
     },
     "routes": {
+      "not-found": {
+        "goHome": "Go Home",
+        "notFound": "Not Found"
+      },
       "oauth-callback": {
         "loading": "Loading"
-      },
-      "not-found": {
-        "notFound": "Not Found",
-        "goHome": "Go Home"
       }
     }
   }

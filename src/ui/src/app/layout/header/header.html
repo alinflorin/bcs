@@ -33,6 +33,11 @@
     <button routerLink="/settings" mat-menu-item>
       <mat-icon>settings</mat-icon>{{ "ui.layout.header.settings" | translate }}
     </button>
+    @if (user.isAdmin) {
+    <button routerLink="/admin" mat-menu-item>
+      <mat-icon>admin_panel_settings</mat-icon>{{ "ui.layout.header.admin" | translate }}
+    </button>
+    }
     <button (click)="onLogoutClicked.emit()" mat-menu-item>
       <mat-icon>logout</mat-icon>{{ "ui.layout.header.logout" | translate }}
     </button>

@@ -1,16 +1,17 @@
 {
   "api": {
     "validation": {
-      "required": "Obligatoriu",
       "alreadyExists": "Deja există",
       "fatalError": "Eroare fatală",
-      "invalidRequest": "Request invalid"
+      "invalidRequest": "Request invalid",
+      "required": "Obligatoriu"
     }
   },
   "ui": {
     "layout": {
       "header": {
         "about": "Despre",
+        "admin": "Administrare",
         "language": "Limbă",
         "login": "Login",
         "logout": "Logout",
@@ -18,18 +19,18 @@
         "theme": "Temă",
         "themes": {
           "auto": "Auto",
-          "light": "Luminos",
-          "dark": "Întunecat"
+          "dark": "Întunecat",
+          "light": "Luminos"
         }
       }
     },
     "routes": {
+      "not-found": {
+        "goHome": "Navighează acasă",
+        "notFound": "Negăsit"
+      },
       "oauth-callback": {
         "loading": "Se încarcă"
-      },
-      "not-found": {
-        "notFound": "Negăsit",
-        "goHome": "Navighează acasă"
       }
     }
   }
