@@ -5,6 +5,7 @@ import { AdminService } from '../../services/admin.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-admin-settings',
@@ -20,6 +21,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 })
 export class AdminSettings implements OnInit {
   private readonly adminService = inject(AdminService);
+  private readonly toastService = inject(ToastService);
 
   ngOnInit(): void {}
 }

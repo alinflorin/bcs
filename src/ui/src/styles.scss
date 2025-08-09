@@ -40,3 +40,21 @@ body {
 .cp {
   cursor: pointer;
 }
+
+.toast-success {
+  .mat-mdc-snackbar-surface {
+    background-color: #43A047 !important;
+  }
+}
+
+.toast-warn {
+  .mat-mdc-snackbar-surface {
+    background-color: #FFA726 !important;
+  }
+}
+
+.toast-error {
+  .mat-mdc-snackbar-surface {
+    background-color: var(--mat-sys-error) !important;
+  }
+}

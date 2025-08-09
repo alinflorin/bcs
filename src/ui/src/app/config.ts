@@ -9,5 +9,6 @@ export const config = {
       code: 'ro',
     },
   ],
-  defaultLanguage: 'en'
+  defaultLanguage: 'en',
+  toastTimeoutMs: 5000
 };
