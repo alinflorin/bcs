@@ -5,7 +5,6 @@ import { NotFound } from './routes/not-found/not-found';
 import { OauthCallback } from './routes/oauth-callback/oauth-callback';
 import { Settings } from './routes/settings/settings';
 import { autoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
-import { Admin } from './routes/admin/admin';
 import { adminGuard } from './services/admin.guard';
 
 export const routes: Routes = [
@@ -28,7 +27,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    component: Admin,
+    loadComponent: () => import('./routes/admin/admin').then(x => x.Admin),
     canActivate: [autoLoginPartialRoutesGuard, adminGuard]
   },
   {
