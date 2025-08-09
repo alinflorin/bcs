@@ -1,21 +1,24 @@
-﻿using AutoMapper;
-using Bcs.Api.Dto;
+﻿using Bcs.Api.Dto;
 using Bcs.Api.Models.Entities;
 using Bcs.Api.Services.Interfaces;
 
 namespace Bcs.Api.Services
 {
-    public class SettingsService(IDatabaseService dbService, IMapper mapper, AppConfig appConfig) : ISettingsService
+    public class SettingsService(IDatabaseService dbService, AppConfig appConfig) : ISettingsService
     {
         private readonly IDatabaseService _dbService = dbService;
-        private readonly IMapper _mapper = mapper;
         private readonly AppConfig _appConfig = appConfig;
 
         public async Task<SettingsDto> SaveSettings(SettingsDto dto, CancellationToken ct = default)
         {
-            var entity = _mapper.Map<SettingsEntity>(dto);
+            var entity = new SettingsEntity { 
+                Id = "settings",
+                SystemPrompt = dto.SystemPrompt!
+            };
             await _dbService.Upsert("settings", x => x.Id, "settings", entity, ct);
-            return _mapper.Map<SettingsDto>(entity);
+            return new SettingsDto {
+                SystemPrompt = dto.SystemPrompt
+            };
         }
 
         public async Task<SettingsDto> GetSettings(CancellationToken ct = default)
@@ -29,7 +32,9 @@ namespace Bcs.Api.Services
                     SystemPrompt = _appConfig.DefaultSettings!.SystemPrompt
                 };
             }
-            return _mapper.Map<SettingsDto>(entity);
+            return new SettingsDto { 
+                SystemPrompt = entity.SystemPrompt
+            };
         }
     }
 }

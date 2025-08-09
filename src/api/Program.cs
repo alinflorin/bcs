@@ -100,7 +100,6 @@ public class Program
             c.OverrideDefaultResultFactoryWith<AutoValidationCustomResultFactory>();
         });
 
-        builder.Services.AddAutoMapper(cfg => {}, typeof(Program).Assembly);
 
         var app = builder.Build();
 
