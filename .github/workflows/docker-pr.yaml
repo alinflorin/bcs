@@ -13,12 +13,18 @@ jobs:
     outputs:
       changed_dirs: ${{ steps.filter.outputs.changed_dirs }}
     steps:
-      - name: Checkout code
+      - name: Checkout PR
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Fetch PR base branch
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
 
       - name: Get changed files
         run: |
-          echo "CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...HEAD)" >> $GITHUB_ENV
+          echo "CHANGED_FILES=$(git diff ${{ github.event.pull_request.base.sha }}...HEAD --name-only)" >> $GITHUB_ENV
 
       - name: Detect changed BCS project dirs
         id: filter
@@ -30,6 +36,7 @@ jobs:
             | grep -v '^bcs-chart$' \
             | xargs)
           echo "changed_dirs=$(jq -nc --arg dirs "$dirs" '$dirs | split(" ")')" >> $GITHUB_OUTPUT
+
 
 
   build:
