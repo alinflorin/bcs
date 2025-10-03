@@ -110,7 +110,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Helm chart to GHCR
-        run: helm push src/chart/dist/*.tgz oci://$GHCR_ORG/charts/bcs
+        run: helm push src/chart/dist/*.tgz oci://$GHCR_ORG/charts
 
   deploy:
     runs-on: ubuntu-latest
