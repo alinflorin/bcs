@@ -4,6 +4,10 @@ on:
   release:
     types: [prereleased]
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   GHCR_ORG: ghcr.io/alinflorin
 
@@ -95,6 +99,13 @@ jobs:
 
       - name: Package Helm chart
         run: helm package src/chart --destination src/chart/dist --version ${VERSION} --app-version ${APP_VERSION}
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Helm chart to GHCR
         run: helm push src/chart/dist/*.tgz oci://$GHCR_ORG/bcs/charts
