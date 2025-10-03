@@ -1,4 +1,4 @@
-name: Draft Release Build Push Deploy
+name: Draft Release - Build Push Deploy
 
 on:
   release:
@@ -111,3 +111,55 @@ jobs:
 
       - name: Push Helm chart to GHCR
         run: helm push src/chart/dist/*.tgz oci://$GHCR_ORG/charts/bcs
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [docker, helm]
+    strategy:
+      matrix:
+        environment: [stg, uat]
+
+    if: ${{ github.event.release.target_commitish == 'main' }}
+
+    environment:
+      name: ${{ matrix.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Write Kubeconfig to file
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+
+      - name: Substitute Secrets Action
+        uses: faradaytrs/substitute-secrets-action@2.1
+        with:
+          input: "src/chart/values-${{ matrix.environment }}.yaml"
+          substitutionRegex: \$\{([A-Z0-9_]+)\}
+          substitutionData: ${{ toJSON(secrets) }}
+          throwOnDataMissing: false
+
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
+          use-cache: "true"
+          tags: tag:mobile
+          version: latest
+
+      - name: Log in to GHCR for Helm
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
+
+      - name: Get release version
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
+      - name: Deploy to ${{ matrix.environment }} environment with Helm
+        run: |
+          helm upgrade --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --install --namespace bcs-${{ matrix.environment }} --create-namespace --values src/chart/values-${{ matrix.environment }}.yaml --version=${VERSION} bcs oci://ghcr.io/alinflorin/charts/bcs
+
+      - name: Remove kubeconfig file
+        if: always()
+        run: rm -rf ${{ github.workspace }}/kubeconfig.yaml || true

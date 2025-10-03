@@ -1,4 +1,4 @@
-name: Helm Chart PR Build
+name: PR Build - Helm Chart
 
 on:
   pull_request:

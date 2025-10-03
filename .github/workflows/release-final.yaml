@@ -1,0 +1,62 @@
+name: Final Release - Deploy
+
+on:
+  release:
+    types: [published]   # only triggers when a release is published
+
+jobs:
+  deploy:
+    if: github.event.release.target_commitish == 'main' && github.event.release.prerelease == false
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [prd]
+    environment:
+      name: ${{ matrix.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Write Kubeconfig to file
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+
+      - name: Substitute Secrets Action
+        uses: faradaytrs/substitute-secrets-action@2.1
+        with:
+          input: "src/chart/values-${{ matrix.environment }}.yaml"
+          substitutionRegex: \$\{([A-Z0-9_]+)\}
+          substitutionData: ${{ toJSON(secrets) }}
+          throwOnDataMissing: false
+
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
+          use-cache: "true"
+          tags: tag:mobile
+          version: latest
+
+      - name: Log in to GHCR for Helm
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
+
+      - name: Get release version
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
+      - name: Deploy to ${{ matrix.environment }} environment with Helm
+        run: |
+          helm upgrade \
+            --kubeconfig ${{ github.workspace }}/kubeconfig.yaml \
+            --install \
+            --namespace bcs \
+            --create-namespace \
+            --values src/chart/values-${{ matrix.environment }}.yaml \
+            --version ${VERSION} \
+            bcs oci://ghcr.io/alinflorin/charts/bcs
+
+      - name: Remove kubeconfig file
+        if: always()
+        run: rm -rf ${{ github.workspace }}/kubeconfig.yaml || true
