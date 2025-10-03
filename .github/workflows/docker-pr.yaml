@@ -5,9 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'src/**'
-    paths-ignore:
-      - 'src/chart/**'
+      - 'src/bcs-*/**'
 
 jobs:
   detect-changes:
@@ -23,11 +21,17 @@ jobs:
           git fetch origin ${{ github.base_ref }} --depth=1
           echo "CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)" >> $GITHUB_ENV
 
-      - name: Detect changed project dirs
+      - name: Detect changed BCS project dirs
         id: filter
         run: |
-          dirs=$(echo "$CHANGED_FILES" | grep '^src/' | cut -d/ -f2 | sort -u | grep -v '^chart$' | xargs)
+          dirs=$(echo "$CHANGED_FILES" \
+            | grep '^src/bcs-' \
+            | cut -d/ -f2 \
+            | sort -u \
+            | grep -v '^bcs-chart$' \
+            | xargs)
           echo "changed_dirs=$(jq -nc --arg dirs "$dirs" '$dirs | split(" ")')" >> $GITHUB_OUTPUT
+
 
   build:
     needs: detect-changes
