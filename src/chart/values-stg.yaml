@@ -1,0 +1,10 @@
+environment: stg
+
+ingress:
+  domain: bcs-stg.huna2.com
+
+secrets:
+  qdrantReadWriteApiKey: '${QDRANT_READ_WRITE_API_KEY}'
+  qdrantReadOnlyApiKey: '${QDRANT_READ_ONLY_API_KEY}'
+  mongodbPassword: '${MONGODB_PASSWORD}'
+  geminiApiKey: '${GEMINI_API_KEY}'

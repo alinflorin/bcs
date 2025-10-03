@@ -1,0 +1,95 @@
+environment: null
+
+ui:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+api:
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+ingress:
+  domain: null
+  extraAnnotations:
+    nginx.ingress.kubernetes.io/limit-rps: "20"                      # 10 requests per second
+    nginx.ingress.kubernetes.io/limit-burst: "40"                    # optional: allows short bursts
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "1"
+    nginx.ingress.kubernetes.io/limit-rate-after: "0"                # apply immediately
+
+qdrant:
+  enabled: true
+  config:
+    cluster:
+      enabled: false
+      p2p:
+        port: 6335
+        enable_tls: false
+      consensus:
+        tick_period_ms: 100
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  persistence:
+    size: 5Gi
+  apiKey:
+    valueFrom:
+      secretKeyRef:
+        name: bcs
+        key: apiKeyReadWrite
+  readOnlyApiKey:
+    valueFrom:
+      secretKeyRef:
+        name: bcs
+        key: apiKeyReadOnly
+
+mongodb:
+  enabled: true
+  username: bcs
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  storage:
+    volumeName: "mongodb-volume"
+    requestedSize: 5Gi
+    accessModes:
+      - ReadWriteOnce
+  env:
+    - name: MONGO_INITDB_ROOT_USERNAME
+      value: root
+    - name: MONGO_INITDB_DATABASE
+      value: bcs
+    - name: USERDB_USER
+      value: bcs
+    - name: MONGO_INITDB_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: bcs
+          key: mongodbPassword
+    - name: USERDB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: bcs
+          key: mongodbPassword
+secrets:
+  qdrantReadWriteApiKey: null
+  qdrantReadOnlyApiKey: null
+  mongodbPassword: null
+  geminiApiKey: null

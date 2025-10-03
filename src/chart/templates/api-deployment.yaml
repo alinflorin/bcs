@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bcs-api
+spec:
+  selector:
+    matchLabels:
+      app: bcs-api
+  template:
+    metadata:
+      labels:
+        app: bcs-api
+    spec:
+      containers:
+        - name: bcs-api
+          image: ghcr.io/alinflorin/bcs-api:{{ .Chart.AppVersion }}
+          imagePullPolicy: IfNotPresent
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: 'GEMINI_APIKEY'
+              valueFrom:
+                secretKeyRef:
+                  name: bcs
+                  key: geminiApiKey
+            - name: 'QDRANT_APIKEY'
+              valueFrom:
+                secretKeyRef:
+                  name: bcs
+                  key: apiKeyReadWrite
+            - name: 'QDRANT_HOSTNAME'
+              value: '{{ .Release.Name }}-qdrant'
+            - name: 'MONGODB_HOSTNAME'
+              value: '{{ .Release.Name }}-mongodb'
+            - name: 'MONGODB_USERNAME'
+              valueFrom:
+                configMapKeyRef:
+                  name: bcs
+                  key: mongodbUsername
+            - name: 'MONGODB_PASSWORD'
+              valueFrom:
+                secretKeyRef:
+                  name: bcs
+                  key: mongodbPassword
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3

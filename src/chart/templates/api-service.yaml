@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bcs-api
+spec:
+  selector:
+    app: bcs-api
+  ports:
+  - port: 80
+    targetPort: 8080
