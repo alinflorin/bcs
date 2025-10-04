@@ -22,6 +22,6 @@ done
 
 FROM caddy:2-alpine
 ENV CADDY_TELEMETRY=off
-COPY --from=builder /app/dist/bcs-ui/browser /usr/share/caddy
+COPY --from=builder /app/dist /usr/share/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
 EXPOSE 80
