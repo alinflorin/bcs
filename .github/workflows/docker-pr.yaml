@@ -22,8 +22,12 @@ jobs:
         run: git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
 
       - name: Get changed files
+        id: changed
         run: |
-          echo "CHANGED_FILES=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD)" >> $GITHUB_ENV
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }} HEAD >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
 
       - name: Detect changed BCS project dirs
         id: filter
