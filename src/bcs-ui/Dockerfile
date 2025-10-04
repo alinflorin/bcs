@@ -25,4 +25,5 @@ FROM caddy:2-alpine
 ENV CADDY_TELEMETRY=off
 COPY --from=builder /app/dist /usr/share/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
+USER appuser
 EXPOSE 80

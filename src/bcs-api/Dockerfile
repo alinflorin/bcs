@@ -10,5 +10,6 @@ RUN npm run build
 FROM node:24-alpine AS runner
 WORKDIR /app
 COPY --from=builder /app/dist /app/dist
+USER appuser
 EXPOSE 8080
 CMD ["node", "/app/dist/index.js"]
