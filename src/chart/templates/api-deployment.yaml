@@ -36,8 +36,8 @@ spec:
                 secretKeyRef:
                   name: bcs
                   key: apiKeyReadWrite
-            - name: 'QDRANT_HOSTNAME'
-              value: '{{ .Release.Name }}-qdrant'
+            - name: 'QDRANT_URL'
+              value: 'http://{{ .Release.Name }}-qdrant:6333'
             - name: NODE_ENV
               value: 'production'
             - name: 'MONGODB_HOSTNAME'
