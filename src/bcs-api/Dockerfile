@@ -2,6 +2,8 @@ FROM node:24-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json tsconfig.json ./
 RUN npm ci
+ARG VERSION
+RUN echo "export const version = '$VERSION';" > ./src/version.ts
 COPY . .
 RUN npm run build
 

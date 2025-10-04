@@ -69,6 +69,7 @@ jobs:
             -t ${{ matrix.project }}:pr-${{ github.event.pull_request.number }} \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache-new,mode=max \
+            --build-arg VERSION=pr-${{ github.event.pull_request.number }} \
             ./src/${{ matrix.project }}
 
       - name: Save updated Docker cache
