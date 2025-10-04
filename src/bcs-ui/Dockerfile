@@ -1,5 +1,6 @@
 FROM node:24-alpine AS builder
 ARG VERSION
+
 WORKDIR /app
 # Install brotli and gzip utilities
 RUN apk add --no-cache brotli gzip
@@ -7,7 +8,7 @@ COPY ./package.json ./package.json
 COPY ./package-lock.json ./package-lock.json
 RUN npm ci
 COPY . .
-# RUN echo "export const version = '$VERSION';" > ./src/version.ts
+RUN echo "export const version = '$VERSION';" > ./src/version.ts
 RUN npm run build
 
 # Precompress only compressible files

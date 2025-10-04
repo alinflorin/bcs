@@ -63,6 +63,8 @@ jobs:
             --cache-from=type=gha \
             --cache-to=type=gha,mode=max \
             -t $GHCR_ORG/${{ matrix.project }}:${VERSION} \
+            -t $GHCR_ORG/${{ matrix.project }}:latest \
+            --build-arg VERSION=${VERSION} \
             src/${{ matrix.project }} \
             --push
 
