@@ -1,8 +1,8 @@
-name: Draft Release - Build Push Deploy
+name: Release - Build Push Deploy
 
 on:
   release:
-    types: [prereleased]
+    types: [released]
 
 env:
   GHCR_ORG: ghcr.io/alinflorin
@@ -117,7 +117,7 @@ jobs:
     needs: [docker, helm]
     strategy:
       matrix:
-        environment: [stg, uat]
+        environment: [stg, uat, prd]
 
     if: ${{ github.event.release.target_commitish == 'main' }}
 
