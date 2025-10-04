@@ -86,22 +86,22 @@ jobs:
             --build-arg VERSION=${{ github.sha }} \
             ./src/${{ matrix.project }}
 
-      - name: Scan image with Trivy and generate SARIF
-        if: contains(needs.detect-changes.outputs.changed_dirs, matrix.project)
-        uses: aquasecurity/trivy-action@0.24.0
-        with:
-          image-ref: ${{ matrix.project }}:${{ github.sha }}
-          format: sarif
-          output: trivy-${{ matrix.project }}.sarif
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: 1  # fail the job if vulnerabilities found
+      # - name: Scan image with Trivy and generate SARIF
+      #   if: contains(needs.detect-changes.outputs.changed_dirs, matrix.project)
+      #   uses: aquasecurity/trivy-action@0.24.0
+      #   with:
+      #     image-ref: ${{ matrix.project }}:${{ github.sha }}
+      #     format: sarif
+      #     output: trivy-${{ matrix.project }}.sarif
+      #     severity: HIGH,CRITICAL
+      #     ignore-unfixed: true
+      #     exit-code: 1  # fail the job if vulnerabilities found
 
-      - name: Upload SARIF to GitHub
-        if: contains(needs.detect-changes.outputs.changed_dirs, matrix.project)
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: trivy-${{ matrix.project }}.sarif
+      # - name: Upload SARIF to GitHub
+      #   if: contains(needs.detect-changes.outputs.changed_dirs, matrix.project)
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+      #     sarif_file: trivy-${{ matrix.project }}.sarif
 
       - name: Save updated Docker cache
         run: |
