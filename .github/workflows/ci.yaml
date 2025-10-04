@@ -1,4 +1,4 @@
-name: PR Validation
+name: CI
 
 on:
   push:
@@ -41,27 +41,32 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             -t ${{ matrix.project }}:${{ github.sha }} \
+            --output type=tar,dest=./${{ matrix.project }}.tar \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg VERSION=${{ github.sha }} \
             ./src/${{ matrix.project }}
 
-      # - name: Scan image with Trivy and generate SARIF
-      #   if: contains(needs.detect-changes.outputs.changed_dirs, matrix.project)
-      #   uses: aquasecurity/trivy-action@0.24.0
-      #   with:
-      #     image-ref: ${{ matrix.project }}:${{ github.sha }}
-      #     format: sarif
-      #     output: trivy-${{ matrix.project }}.sarif
-      #     severity: HIGH,CRITICAL
-      #     ignore-unfixed: true
-      #     exit-code: 1  # fail the job if vulnerabilities found
 
-      # - name: Upload SARIF to GitHub
-      #   if: contains(needs.detect-changes.outputs.changed_dirs, matrix.project)
-      #   uses: github/codeql-action/upload-sarif@v2
-      #   with:
-      #     sarif_file: trivy-${{ matrix.project }}.sarif
+      - name: Load Docker image from tar
+        run: |
+          docker load -i ./${{ matrix.project }}.tar
+
+
+      - name: Scan image with Trivy and generate SARIF
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: ${{ matrix.project }}:${{ github.sha }}
+          format: sarif
+          output: trivy-${{ matrix.project }}.sarif
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 0  # fail the job if vulnerabilities found
+
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: trivy-${{ matrix.project }}.sarif
 
       - name: Save updated Docker cache
         run: |
