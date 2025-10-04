@@ -11,14 +11,26 @@ on:
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runs-on }}
     permissions:
       actions: read
       contents: read
       security-events: write
     strategy:
       matrix:
-        project: [bcs-api, bcs-ui]
+        include:
+          - project: bcs-api
+            runs-on: ubuntu-latest
+            platform: linux/amd64
+          - project: bcs-ui
+            runs-on: ubuntu-latest
+            platform: linux/amd64
+          - project: bcs-api
+            runs-on: ubuntu-24.04-arm
+            platform: linux/arm64
+          - project: bcs-ui
+            runs-on: ubuntu-24.04-arm
+            platform: linux/arm64
       max-parallel: 5
     steps:
       - name: Checkout code
@@ -39,28 +51,29 @@ jobs:
         run: |
           echo "Building project: ${{ matrix.project }}"
           docker buildx build \
-            --platform linux/amd64,linux/arm64 \
+            --platform ${{ matrix.platform }} \
             -t ${{ matrix.project }}:${{ github.sha }} \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg VERSION=${{ github.sha }} \
+            --load \
             ./src/${{ matrix.project }}
 
             
-      # - name: Scan image with Trivy and generate SARIF
-      #   uses: aquasecurity/trivy-action@0.33.1
-      #   with:
-      #     input: ./${{ matrix.project }}.tar
-      #     format: sarif
-      #     output: trivy-${{ matrix.project }}.sarif
-      #     severity: HIGH,CRITICAL
-      #     ignore-unfixed: true
-      #     exit-code: 0
+      - name: Scan image with Trivy and generate SARIF
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: ${{ matrix.project }}:${{ github.sha }}
+          format: sarif
+          output: trivy-${{ matrix.project }}.sarif
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 0
 
-      # - name: Upload SARIF to GitHub
-      #   uses: github/codeql-action/upload-sarif@v3
-      #   with:
-      #     sarif_file: trivy-${{ matrix.project }}.sarif
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-${{ matrix.project }}.sarif
 
       - name: Save updated Docker cache
         run: |
