@@ -48,20 +48,15 @@ jobs:
             ./src/${{ matrix.project }}
 
 
-      - name: Load Docker image from tar
-        run: |
-          docker load -i ./${{ matrix.project }}.tar
-
-
       - name: Scan image with Trivy and generate SARIF
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: ${{ matrix.project }}:${{ github.sha }}
+          input: ./${{ matrix.project }}.tar
           format: sarif
           output: trivy-${{ matrix.project }}.sarif
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-          exit-code: 0  # fail the job if vulnerabilities found
+          exit-code: 0
 
       - name: Upload SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v2
@@ -74,7 +69,7 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   codeql:
-    name: Analyze
+    name: analyze
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -141,3 +136,19 @@ jobs:
         run: |
           echo "Packaged chart(s):"
           ls -l ./src/chart/dist
+
+      - name: Scan Helm chart with Trivy and generate SARIF
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: config         # for Helm/K8s configs
+          format: sarif
+          output: trivy-helm.sarif
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 0              # don’t fail the job
+          input: ./src/chart 
+        
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: trivy-helm.sarif
