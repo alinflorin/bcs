@@ -41,13 +41,16 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             -t ${{ matrix.project }}:${{ github.sha }} \
-            --output type=tar,dest=./${{ matrix.project }}.tar \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg VERSION=${{ github.sha }} \
             ./src/${{ matrix.project }}
 
 
+      - name: Save image for Trivy
+        run: |
+          docker save ${{ matrix.project }}:${{ github.sha }} -o ./${{ matrix.project }}.tar
+            
       - name: Scan image with Trivy and generate SARIF
         uses: aquasecurity/trivy-action@0.33.1
         with:
@@ -93,6 +96,10 @@ jobs:
 
   helm:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
