@@ -1,6 +1,12 @@
 name: PR Build - Helm Chart
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/chart/**"
+      
   pull_request:
     branches:
       - main

@@ -1,6 +1,12 @@
 name: PR Build - Docker
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/bcs-*/**'
+
   pull_request:
     branches:
       - main
@@ -74,17 +80,17 @@ jobs:
           echo "Building project: ${{ matrix.project }}"
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
-            -t ${{ matrix.project }}:pr-${{ github.event.pull_request.number }} \
+            -t ${{ matrix.project }}:${{ github.sha }} \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            --build-arg VERSION=pr-${{ github.event.pull_request.number }} \
+            --build-arg VERSION=${{ github.sha }} \
             ./src/${{ matrix.project }}
 
       - name: Scan image with Trivy and generate SARIF
         if: contains(needs.detect-changes.outputs.changed_dirs, matrix.project)
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: ${{ matrix.project }}
+          image-ref: ${{ matrix.project }}:${{ github.sha }}
           format: sarif
           output: trivy-${{ matrix.project }}.sarif
           severity: HIGH,CRITICAL
