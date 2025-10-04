@@ -2,7 +2,7 @@ name: Final Release - Deploy
 
 on:
   release:
-    types: [published]   # only triggers when a release is published
+    types: [released]   # only triggers when a release is published
 
 jobs:
   deploy:
