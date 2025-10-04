@@ -7,7 +7,7 @@ COPY ./package.json ./package.json
 COPY ./package-lock.json ./package-lock.json
 RUN npm i --legacy-peer-deps
 COPY . .
-RUN echo "export const version = '$VERSION';" > ./src/version.ts
+# RUN echo "export const version = '$VERSION';" > ./src/version.ts
 RUN npm run build
 
 # Precompress only compressible files
