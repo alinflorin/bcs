@@ -25,7 +25,7 @@ appVersion: "1.0.0"
 
 dependencies:
   - name: qdrant
-    version: "1.15.1"
+    version: 1.15.5
     repository: "https://qdrant.github.io/qdrant-helm"
   - name: mongodb
     version: "0.7.1"
