@@ -66,8 +66,8 @@ jobs:
           echo "Building ${{ matrix.project }}${{ matrix.suffix }}..."
           docker buildx build \
             --platform ${{ matrix.platform }} \
-            --cache-from=type=gha \
-            --cache-to=type=gha,mode=max \
+            --cache-from=type=local,src=/tmp/.buildx-cache \
+            --cache-to=type=local,dest=/tmp/.buildx-cache-new,mode=max \
             -t $GHCR_ORG/${{ matrix.project }}:${VERSION}${{ matrix.suffix }} \
             -t $GHCR_ORG/${{ matrix.project }}:latest${{ matrix.suffix }} \
             --build-arg VERSION=${VERSION} \
