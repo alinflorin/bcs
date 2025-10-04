@@ -3,8 +3,8 @@ WORKDIR /app
 COPY package.json package-lock.json tsconfig.json ./
 RUN npm ci
 ARG VERSION
-RUN echo "export const version = '$VERSION';" > ./src/version.ts
 COPY . .
+RUN echo "export const version = '$VERSION';" > ./src/version.ts
 RUN npm run build
 
 FROM node:24-alpine AS runner
