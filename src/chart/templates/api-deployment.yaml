@@ -38,6 +38,8 @@ spec:
                   key: apiKeyReadWrite
             - name: 'QDRANT_HOSTNAME'
               value: '{{ .Release.Name }}-qdrant'
+            - name: NODE_ENV
+              value: 'production'
             - name: 'MONGODB_HOSTNAME'
               value: '{{ .Release.Name }}-mongodb'
             - name: 'MONGODB_USERNAME'

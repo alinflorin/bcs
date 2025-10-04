@@ -167,3 +167,4 @@ dist
 .git
 dist/
 Dockerfile
+.env
