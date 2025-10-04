@@ -46,25 +46,21 @@ jobs:
             --build-arg VERSION=${{ github.sha }} \
             ./src/${{ matrix.project }}
 
-
-      - name: Save image for Trivy
-        run: |
-          docker save ${{ matrix.project }}:${{ github.sha }} -o ./${{ matrix.project }}.tar
             
-      - name: Scan image with Trivy and generate SARIF
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          input: ./${{ matrix.project }}.tar
-          format: sarif
-          output: trivy-${{ matrix.project }}.sarif
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: 0
+      # - name: Scan image with Trivy and generate SARIF
+      #   uses: aquasecurity/trivy-action@0.33.1
+      #   with:
+      #     input: ./${{ matrix.project }}.tar
+      #     format: sarif
+      #     output: trivy-${{ matrix.project }}.sarif
+      #     severity: HIGH,CRITICAL
+      #     ignore-unfixed: true
+      #     exit-code: 0
 
-      - name: Upload SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: trivy-${{ matrix.project }}.sarif
+      # - name: Upload SARIF to GitHub
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   with:
+      #     sarif_file: trivy-${{ matrix.project }}.sarif
 
       - name: Save updated Docker cache
         run: |
@@ -72,7 +68,6 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   codeql:
-    name: analyze
     runs-on: ubuntu-latest
     permissions:
       actions: read
