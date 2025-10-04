@@ -11,6 +11,12 @@ spec:
       labels:
         app: bcs-ui
     spec:
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        runAsNonRoot: true
+        readOnlyRootFilesystem: true
       containers:
         - name: bcs-ui
           image: ghcr.io/alinflorin/bcs-ui:{{ .Chart.AppVersion }}-{{ .Values.arch }}
