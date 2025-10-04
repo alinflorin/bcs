@@ -39,10 +39,3 @@ spec:
                 name: bcs-api
                 port:
                   number: 80
-          - path: /signalr
-            pathType: Prefix
-            backend:
-              service:
-                name: bcs-api
-                port:
-                  number: 80
