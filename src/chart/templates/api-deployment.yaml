@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: bcs-api
-          image: ghcr.io/alinflorin/bcs-api:{{ .Chart.AppVersion }}
+          image: ghcr.io/alinflorin/bcs-api:{{ .Chart.AppVersion }}-{{ .Values.arch }}
           imagePullPolicy: IfNotPresent
           resources:
             {{- toYaml .Values.api.resources | nindent 12 }}

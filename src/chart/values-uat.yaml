@@ -1,5 +1,5 @@
 environment: uat
-
+arch: arm64
 ingress:
   domain: bcs-uat.huna2.com
 

@@ -1,5 +1,5 @@
 environment: prd
-
+arch: arm64
 ingress:
   domain: bcs.huna2.com
 

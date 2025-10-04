@@ -13,11 +13,27 @@ jobs:
       contents: read        # allows reading repo content
       packages: write       # required to push to GitHub Container Registry
     if: ${{ github.event.release.target_commitish == 'main' }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: false
       matrix:
-        project: [bcs-api, bcs-ui]
+        include:
+          - project: bcs-api
+            runs-on: ubuntu-latest
+            platform: linux/amd64
+            suffix: -amd64
+          - project: bcs-ui
+            runs-on: ubuntu-latest
+            platform: linux/amd64
+            suffix: -amd64
+          - project: bcs-api
+            runs-on: ubuntu-24.04-arm
+            platform: linux/arm64
+            suffix: -arm64
+          - project: bcs-ui
+            runs-on: ubuntu-24.04-arm
+            platform: linux/arm64
+            suffix: -arm64
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,18 +53,32 @@ jobs:
       - name: Get release version
         run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
+      - name: Restore Docker cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: buildx-${{ matrix.project }}-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            buildx-${{ matrix.project }}-${{ runner.os }}-
+
       - name: Build and push Docker image
         run: |
-          echo "Building ${{ matrix.project }}..."
+          echo "Building ${{ matrix.project }}${{ matrix.suffix }}..."
           docker buildx build \
-            --platform linux/amd64,linux/arm64 \
+            --platform ${{ matrix.platform }} \
             --cache-from=type=gha \
             --cache-to=type=gha,mode=max \
-            -t $GHCR_ORG/${{ matrix.project }}:${VERSION} \
-            -t $GHCR_ORG/${{ matrix.project }}:latest \
+            -t $GHCR_ORG/${{ matrix.project }}:${VERSION}${{ matrix.suffix }} \
+            -t $GHCR_ORG/${{ matrix.project }}:latest${{ matrix.suffix }} \
             --build-arg VERSION=${VERSION} \
             src/${{ matrix.project }} \
             --push
+
+
+      - name: Save updated Docker cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   helm:
     permissions:
