@@ -59,7 +59,7 @@ jobs:
           exit-code: 0
 
       - name: Upload SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy-${{ matrix.project }}.sarif
 
@@ -149,6 +149,6 @@ jobs:
           input: ./src/chart 
         
       - name: Upload SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy-helm.sarif
