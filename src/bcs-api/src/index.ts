@@ -1,4 +1,5 @@
 import express from 'express';
+import { version } from './version';
 
 const app = express();
 app.use(express.json());
@@ -8,7 +9,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hello, world!' });
+  res.json({ message: 'Hello, world! Version: ' + version });
 });
 
 app.listen(8080, () => {
