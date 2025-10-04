@@ -1,18 +1,26 @@
-name: Final Release - Deploy
+name: Manual Deploy Version
 
 on:
-  release:
-    types: [released]   # only triggers when a release is published
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select the deployment environment"
+        required: true
+        type: choice
+        options:
+          - stg
+          - uat
+          - prd
+      version:
+        description: "Specify the release version (tag)"
+        required: true
+        type: string
 
 jobs:
   deploy:
-    if: github.event.release.target_commitish == 'main' && github.event.release.prerelease == false
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        environment: [prd]
     environment:
-      name: ${{ matrix.environment }}
+      name: ${{ github.event.inputs.environment }}
 
     steps:
       - name: Checkout code
@@ -25,7 +33,7 @@ jobs:
       - name: Substitute Secrets Action
         uses: faradaytrs/substitute-secrets-action@2.1
         with:
-          input: "src/chart/values-${{ matrix.environment }}.yaml"
+          input: "src/chart/values-${{ github.event.inputs.environment }}.yaml"
           substitutionRegex: \$\{([A-Z0-9_]+)\}
           substitutionData: ${{ toJSON(secrets) }}
           throwOnDataMissing: false
@@ -43,18 +51,15 @@ jobs:
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
 
-      - name: Get release version
-        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-
-      - name: Deploy to ${{ matrix.environment }} environment with Helm
+      - name: Deploy to ${{ github.event.inputs.environment }} environment with Helm
         run: |
           helm upgrade \
             --kubeconfig ${{ github.workspace }}/kubeconfig.yaml \
             --install \
-            --namespace bcs-${{ matrix.environment }} \
+            --namespace bcs-${{ github.event.inputs.environment }} \
             --create-namespace \
-            --values src/chart/values-${{ matrix.environment }}.yaml \
-            --version ${VERSION} \
+            --values src/chart/values-${{ github.event.inputs.environment }}.yaml \
+            --version ${{ github.event.inputs.version }} \
             bcs oci://ghcr.io/alinflorin/charts/bcs
 
       - name: Remove kubeconfig file
