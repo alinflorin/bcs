@@ -1,7 +1,7 @@
 name: Reusable Docker CI
 
 on:
-  workflow_call: 
+  workflow_call:
     inputs:
       project:
         type: string
@@ -9,20 +9,17 @@ on:
 
 jobs:
   docker:
-    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+
+    runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+
     permissions:
       actions: read
       contents: read
       security-events: write
-    strategy:
-      matrix:
-        include:
-          - platform: linux/amd64
-            runs-on: ubuntu-latest
-            suffix: '-amd64'
-          - platform: linux/arm64
-            runs-on: ubuntu-24.04-arm
-            suffix: '-arm64'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,37 +31,38 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: buildx-${{ inputs.project }}-${{ runner.os }}-${{ github.sha }}
+          key: buildx-${{ inputs.project }}-${{ matrix.platform }}-${{ github.ref_name }}
           restore-keys: |
-            buildx-${{ inputs.project }}-${{ runner.os }}-
+            buildx-${{ inputs.project }}-${{ matrix.platform }}-
 
-      - name: Build multi-arch Docker image with cache
+      - name: Build Docker image
         run: |
-          echo "Building project: ${{ inputs.project }}${{ matrix.suffix }}"
+          suffix="-$(echo "${{ matrix.platform }}" | cut -d'/' -f2)"
+          echo "Building project: ${{ inputs.project }}${suffix}"
           docker buildx build \
             --platform ${{ matrix.platform }} \
-            -t ${{ inputs.project }}:${{ github.sha }}${{ matrix.suffix }} \
+            -t ${{ inputs.project }}:${{ github.sha }}${suffix} \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg VERSION=${{ github.sha }} \
             --load \
             ./src/${{ inputs.project }}
 
-            
-      - name: Scan image with Trivy and generate SARIF
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: ${{ inputs.project }}:${{ github.sha }}${{ matrix.suffix }}
-          format: sarif
-          output: trivy-${{ inputs.project }}${{ matrix.suffix }}.sarif
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: 0
+      - name: Scan image with Trivy
+        run: |
+          suffix="-$(echo "${{ matrix.platform }}" | cut -d'/' -f2)"
+          echo "Scanning ${{ inputs.project }}${suffix}"
+          trivy image \
+            --format sarif \
+            --output trivy-${{ inputs.project }}${suffix}.sarif \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            ${{ inputs.project }}:${{ github.sha }}${suffix} || true
 
       - name: Upload SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: trivy-${{ inputs.project }}${{ matrix.suffix }}.sarif
+          sarif_file: trivy-${{ inputs.project }}-*.sarif
 
       - name: Save updated Docker cache
         run: |
