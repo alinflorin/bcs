@@ -28,3 +28,4 @@ jobs:
     with:
       ci: true
       version: ${{ github.sha }}
+    secrets: inherit

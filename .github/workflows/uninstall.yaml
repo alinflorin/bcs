@@ -19,3 +19,4 @@ jobs:
       env: ${{ inputs.environment }}
       version: '-'
       uninstall: true
+    secrets: inherit

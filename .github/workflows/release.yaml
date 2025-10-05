@@ -23,6 +23,7 @@ jobs:
       project: ${{ matrix.project }}
       ci: false
       version: ${{ github.ref_name }}
+    secrets: inherit
 
 
   helm:
@@ -36,6 +37,7 @@ jobs:
     with:
       ci: false
       version: ${{ github.ref_name }}
+    secrets: inherit
 
   deploy:
     needs: [docker, helm]
@@ -48,3 +50,4 @@ jobs:
       env: ${{ matrix.environment }}
       version: ${{ github.ref_name }}
       uninstall: false
+    secrets: inherit
