@@ -13,9 +13,6 @@ on:
         type: boolean
         required: true
 
-env:
-  GHCR_ORG: ghcr.io/alinflorin
-
 jobs:
   docker:
     strategy:
@@ -50,7 +47,7 @@ jobs:
         with:
           context: ./src/${{ inputs.project }}
           platforms: ${{ matrix.platform }}
-          tags: ${{ inputs.project }}:${{ inputs.version }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+          tags: ${{ inputs.ci == true && '' || 'ghcr.io/alinflorin/' }}${{ inputs.project }}:${{ inputs.version }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: VERSION=${{ inputs.version }}
