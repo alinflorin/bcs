@@ -19,7 +19,7 @@ spec:
         readOnlyRootFilesystem: true
       containers:
         - name: bcs-ui
-          image: ghcr.io/alinflorin/bcs-ui:{{ .Chart.AppVersion }}-{{ .Values.arch }}
+          image: ghcr.io/alinflorin/bcs-ui-{{ .Values.arch }}:{{ .Chart.AppVersion }}
           imagePullPolicy: IfNotPresent
           resources:
             {{- toYaml .Values.ui.resources | nindent 12 }}

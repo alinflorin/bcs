@@ -47,7 +47,7 @@ jobs:
         with:
           context: ./src/${{ inputs.project }}
           platforms: ${{ matrix.platform }}
-          tags: ${{ inputs.ci == true && '' || 'ghcr.io/alinflorin/' }}${{ inputs.project }}:${{ inputs.version }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+          tags: ${{ inputs.ci == true && '' || 'ghcr.io/alinflorin/' }}${{ inputs.project }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}:${{ inputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: VERSION=${{ inputs.version }}
@@ -58,7 +58,7 @@ jobs:
         if: ${{ inputs.ci == true }}
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: ${{ inputs.project }}:${{ inputs.version }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+          image-ref: ${{ inputs.project }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}:${{ inputs.version }}
           format: sarif
           output: trivy-${{ inputs.project }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}.sarif
           severity: HIGH,CRITICAL
