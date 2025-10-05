@@ -35,7 +35,7 @@ jobs:
 
       - name: Substitute Secrets Action
         if: ${{ inputs.uninstall == false }}
-        uses: faradaytrs/substitute-secrets-action@2.1
+        uses: faradaytrs/substitute-secrets-action@2.4
         with:
           input: "src/chart/values-${{ inputs.env }}.yaml"
           substitutionRegex: \$\{([A-Z0-9_]+)\}
