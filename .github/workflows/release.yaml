@@ -9,174 +9,41 @@ env:
 
 jobs:
   docker:
-    permissions:
-      contents: read        # allows reading repo content
-      packages: write       # required to push to GitHub Container Registry
     if: ${{ github.event.release.target_commitish == 'main' }}
-    runs-on: ${{ matrix.runs-on }}
     strategy:
-      fail-fast: false
       matrix:
-        include:
-          - project: bcs-api
-            runs-on: ubuntu-latest
-            platform: linux/amd64
-            suffix: -amd64
-          - project: bcs-ui
-            runs-on: ubuntu-latest
-            platform: linux/amd64
-            suffix: -amd64
-          - project: bcs-api
-            runs-on: ubuntu-24.04-arm
-            platform: linux/arm64
-            suffix: -arm64
-          - project: bcs-ui
-            runs-on: ubuntu-24.04-arm
-            platform: linux/arm64
-            suffix: -arm64
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        project: ['bcs-ui', 'bcs-api']
+    permissions:
+      actions: read
+      contents: read
+      security-events: none
+      packages: write
+    uses: ./.github/workflows/reusable-docker-ci.yaml
+    with:
+      project: ${{ matrix.project }}
+      ci: false
+      version: ${{ github.ref_name }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get release version
-        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-
-      - name: Prepare buildx cache dir
-        run: mkdir -p /tmp/.buildx-cache /tmp/.buildx-cache-new
-
-      - name: Restore Docker cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: buildx-${{ matrix.project }}-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            buildx-${{ matrix.project }}-${{ runner.os }}-
-
-      - name: Build and push Docker image
-        run: |
-          echo "Building ${{ matrix.project }}${{ matrix.suffix }}..."
-          docker buildx build \
-            --platform ${{ matrix.platform }} \
-            --cache-from=type=local,src=/tmp/.buildx-cache \
-            --cache-to=type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            -t $GHCR_ORG/${{ matrix.project }}:${VERSION}${{ matrix.suffix }} \
-            -t $GHCR_ORG/${{ matrix.project }}:latest${{ matrix.suffix }} \
-            --build-arg VERSION=${VERSION} \
-            src/${{ matrix.project }} \
-            --push
-
-
-      - name: Save updated Docker cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   helm:
     permissions:
-      contents: read        # allows reading repo content
-      packages: write       # required to push to GitHub Container Registry
+      actions: read
+      contents: read
+      security-events: none
+      packages: write
     if: ${{ github.event.release.target_commitish == 'main' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v3
-        with:
-          version: v3.19.0
-          
-      - name: Cache Helm dependencies
-        uses: actions/cache@v4
-        with:
-          path: src/chart/charts
-          key: helm-deps-${{ runner.os }}-${{ hashFiles('src/chart/Chart.lock') }}
-          restore-keys: |
-            helm-deps-${{ runner.os }}-
-
-      - name: Get release version
-        run: |
-          echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-          echo "APP_VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-
-      - name: Update Helm dependencies
-        run: helm dependency update src/chart
-
-      - name: Package Helm chart
-        run: helm package src/chart --destination src/chart/dist --version ${VERSION} --app-version ${APP_VERSION}
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push Helm chart to GHCR
-        run: helm push src/chart/dist/*.tgz oci://$GHCR_ORG/charts
+    uses: ./.github/workflows/reusable-helm-ci.yaml
+    with:
+      ci: false
+      version: ${{ github.ref_name }}
 
   deploy:
-    runs-on: ubuntu-latest
     needs: [docker, helm]
     strategy:
       matrix:
         environment: [stg, uat, prd]
-
     if: ${{ github.event.release.target_commitish == 'main' }}
-
-    environment:
-      name: ${{ matrix.environment }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Write Kubeconfig to file
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
-
-      - name: Substitute Secrets Action
-        uses: faradaytrs/substitute-secrets-action@2.1
-        with:
-          input: "src/chart/values-${{ matrix.environment }}.yaml"
-          substitutionRegex: \$\{([A-Z0-9_]+)\}
-          substitutionData: ${{ toJSON(secrets) }}
-          throwOnDataMissing: false
-
-      - name: Setup Tailscale
-        uses: tailscale/github-action@v3
-        with:
-          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
-          use-cache: "true"
-          tags: tag:mobile
-          version: latest
-
-      - name: Log in to GHCR for Helm
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
-
-      - name: Get release version
-        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-
-      - name: Deploy to ${{ matrix.environment }} environment with Helm
-        run: |
-          helm upgrade --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --install --namespace bcs-${{ matrix.environment }} --create-namespace --values src/chart/values-${{ matrix.environment }}.yaml --version=${VERSION} bcs oci://ghcr.io/alinflorin/charts/bcs
-
-      - name: Remove kubeconfig file
-        if: always()
-        run: rm -rf ${{ github.workspace }}/kubeconfig.yaml || true
+    uses: ./.github/workflows/reusable-deploy.yaml
+    with:
+      env: ${{ matrix.environment }}
+      version: ${{ github.ref_name }}
