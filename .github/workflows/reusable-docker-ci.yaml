@@ -47,7 +47,7 @@ jobs:
         with:
           context: ./src/${{ inputs.project }}
           platforms: ${{ matrix.platform }}
-          tags: ${{ inputs.ci == true && '' || 'ghcr.io/alinflorin/' }}${{ inputs.project }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}:${{ inputs.version }}
+          tags: ${{ inputs.ci == false && 'ghcr.io/alinflorin/' || '' }}${{ inputs.project }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}:${{ inputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: VERSION=${{ inputs.version }}
