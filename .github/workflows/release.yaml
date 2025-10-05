@@ -54,7 +54,7 @@ jobs:
         run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
       - name: Restore Docker cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: buildx-${{ matrix.project }}-${{ runner.os }}-${{ github.sha }}
@@ -98,7 +98,7 @@ jobs:
           version: v3.19.0
 
       - name: Cache Helm dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: src/chart/charts
           key: helm-deps-${{ runner.os }}-${{ hashFiles('src/chart/Chart.lock') }}

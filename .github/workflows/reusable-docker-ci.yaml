@@ -28,7 +28,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Restore Docker cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: buildx-${{ inputs.project }}-${{ matrix.platform }}-${{ github.ref_name }}
