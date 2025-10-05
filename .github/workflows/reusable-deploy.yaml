@@ -51,17 +51,20 @@ jobs:
           tags: tag:mobile
           version: latest
 
-      - name: Log in to GHCR for Helm
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
         if: ${{ inputs.uninstall == false }}
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to ${{ inputs.env }} environment with Helm
         if: ${{ inputs.uninstall == false }}
         run: |
           helm upgrade --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --install --namespace bcs-${{ inputs.env }} --create-namespace --values src/chart/values-${{ inputs.env }}.yaml --version=${{ inputs.version }} bcs oci://ghcr.io/alinflorin/charts/bcs
 
-      - name: Deploy to ${{ inputs.env }} environment with Helm
+      - name: Uninstall from ${{ inputs.env }} environment with Helm
         if: ${{ inputs.uninstall == true }}
         run: |
           helm uninstall --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --namespace bcs-${{ inputs.env }} bcs
