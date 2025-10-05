@@ -1,0 +1,83 @@
+name: Chart CI
+
+on:
+  push:
+    branches:
+      - main
+    paths: 
+      - src/chart/**
+      - .github/workflows/chart-ci.yaml
+
+  pull_request:
+    branches:
+      - main
+    paths: 
+      - src/chart/**
+      - .github/workflows/chart-ci.yaml
+
+jobs:
+  helm:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.19.0
+
+      - name: Cache Helm dependencies
+        uses: actions/cache@v3
+        with:
+          path: src/chart/charts
+          key: helm-deps-${{ runner.os }}-${{ hashFiles('src/chart/Chart.lock') }}
+          restore-keys: |
+            helm-deps-${{ runner.os }}-
+
+      - name: Update Helm dependencies
+        run: |
+          echo "Updating Helm dependencies..."
+          helm dependency update ./src/chart
+
+      - name: Lint Helm chart
+        run: |
+          echo "Linting Helm chart..."
+          helm lint ./src/chart
+
+      - name: Template Helm chart
+        run: |
+          echo "Rendering Helm chart templates..."
+          helm template ./src/chart
+
+      - name: Package Helm chart
+        run: |
+          echo "Packaging Helm chart..."
+          helm package ./src/chart --destination ./src/chart/dist
+
+      - name: List packaged chart
+        run: |
+          echo "Packaged chart(s):"
+          ls -l ./src/chart/dist
+
+      - name: Scan Helm chart with Trivy and generate SARIF
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: config         # for Helm/K8s configs
+          format: sarif
+          output: trivy-helm.sarif
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 0              # don’t fail the job
+          input: ./src/chart 
+        
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-helm.sarif

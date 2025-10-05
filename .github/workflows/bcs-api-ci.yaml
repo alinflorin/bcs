@@ -1,0 +1,24 @@
+name: bcs-api Docker CI
+
+on:
+  push:
+    branches:
+      - main
+    paths: 
+      - src/bcs-api/**
+      - .github/workflows/bcs-api-ci.yaml
+      - .github/workflows/reusable-docker-ci.yaml
+
+  pull_request:
+    branches:
+      - main
+    paths: 
+      - src/bcs-api/**
+      - .github/workflows/bcs-api-ci.yaml
+      - .github/workflows/reusable-docker-ci.yaml
+
+jobs:
+  reusable-docker:
+    uses: ./.github/workflows/reusable-docker-ci.yaml
+    with:
+      project: 'bcs-api'
