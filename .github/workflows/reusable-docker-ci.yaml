@@ -36,24 +36,24 @@ jobs:
         with:
           context: ./src/${{ inputs.project }}
           platforms: ${{ matrix.platform }}
-          tags: ${{ inputs.project }}:${{ github.sha }}-${{ matrix.platform }}
+          tags: ${{ inputs.project }}:${{ github.sha }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: VERSION=${{ github.sha }}
           load: true
 
-      - name: Scan image with Trivy
+      - name: Scan Docker image with Trivy
         run: |
-          suffix="-$(echo "${{ matrix.platform }}" | cut -d'/' -f2)"
-          echo "Scanning ${{ inputs.project }}${suffix}"
+          suffix=${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+          echo "Scanning ${{ inputs.project }}-$suffix"
           trivy image \
             --format sarif \
-            --output trivy-${{ inputs.project }}${suffix}.sarif \
+            --output trivy-${{ inputs.project }}-$suffix.sarif \
             --severity HIGH,CRITICAL \
             --ignore-unfixed \
-            ${{ inputs.project }}:${{ github.sha }}${suffix} || true
+            ${{ inputs.project }}:${{ github.sha }}-$suffix || true
 
       - name: Upload SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: trivy-${{ inputs.project }}-*.sarif
+          sarif_file: trivy-${{ inputs.project }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}.sarif
