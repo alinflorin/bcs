@@ -16,7 +16,6 @@ spec:
         runAsGroup: 1001
         fsGroup: 1001
         runAsNonRoot: true
-        readOnlyRootFilesystem: true
       containers:
         - name: bcs-api
           image: ghcr.io/alinflorin/bcs-api-{{ .Values.arch }}:{{ .Chart.AppVersion }}
