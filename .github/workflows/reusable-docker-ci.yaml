@@ -27,6 +27,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Prepare buildx cache dir
+        run: mkdir -p /tmp/.buildx-cache /tmp/.buildx-cache-new
+
       - name: Restore Docker cache
         uses: actions/cache@v4
         with:

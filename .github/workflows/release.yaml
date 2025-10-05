@@ -53,6 +53,9 @@ jobs:
       - name: Get release version
         run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
+      - name: Prepare buildx cache dir
+        run: mkdir -p /tmp/.buildx-cache /tmp/.buildx-cache-new
+
       - name: Restore Docker cache
         uses: actions/cache@v4
         with:
@@ -96,7 +99,7 @@ jobs:
         uses: azure/setup-helm@v3
         with:
           version: v3.19.0
-
+          
       - name: Cache Helm dependencies
         uses: actions/cache@v4
         with:
