@@ -23,7 +23,7 @@ jobs:
       actions: read
       contents: read
       security-events: write
-      packages: none
+      packages: write
     uses: ./.github/workflows/reusable-docker-ci.yaml
     with:
       project: 'bcs-api'

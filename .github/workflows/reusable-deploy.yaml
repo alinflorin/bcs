@@ -9,6 +9,9 @@ on:
       env:
         type: string
         required: true
+      uninstall:
+        type: boolean
+        required: true
 
 jobs:
   deploy:
@@ -26,6 +29,7 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
 
       - name: Substitute Secrets Action
+        if: ${{ inputs.uninstall == false }}
         uses: faradaytrs/substitute-secrets-action@2.1
         with:
           input: "src/chart/values-${{ inputs.env }}.yaml"
@@ -43,12 +47,19 @@ jobs:
           version: latest
 
       - name: Log in to GHCR for Helm
+        if: ${{ inputs.uninstall == false }}
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
 
       - name: Deploy to ${{ inputs.env }} environment with Helm
+        if: ${{ inputs.uninstall == false }}
         run: |
           helm upgrade --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --install --namespace bcs-${{ inputs.env }} --create-namespace --values src/chart/values-${{ inputs.env }}.yaml --version=${{ inputs.version }} bcs oci://ghcr.io/alinflorin/charts/bcs
+
+      - name: Deploy to ${{ inputs.env }} environment with Helm
+        if: ${{ inputs.uninstall == true }}
+        run: |
+          helm uninstall --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --namespace bcs-${{ inputs.env }} bcs
 
       - name: Remove kubeconfig file
         if: always()

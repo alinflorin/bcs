@@ -18,50 +18,8 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.event.inputs.environment }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Write Kubeconfig to file
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
-
-      - name: Substitute Secrets Action
-        uses: faradaytrs/substitute-secrets-action@2.1
-        with:
-          input: "src/chart/values-${{ github.event.inputs.environment }}.yaml"
-          substitutionRegex: \$\{([A-Z0-9_]+)\}
-          substitutionData: ${{ toJSON(secrets) }}
-          throwOnDataMissing: false
-
-      - name: Setup Tailscale
-        uses: tailscale/github-action@v3
-        with:
-          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
-          use-cache: "true"
-          tags: tag:mobile
-          version: latest
-
-      - name: Log in to GHCR for Helm
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
-
-      - name: Deploy to ${{ github.event.inputs.environment }} environment with Helm
-        run: |
-          helm upgrade \
-            --kubeconfig ${{ github.workspace }}/kubeconfig.yaml \
-            --install \
-            --namespace bcs-${{ github.event.inputs.environment }} \
-            --create-namespace \
-            --values src/chart/values-${{ github.event.inputs.environment }}.yaml \
-            --version ${{ github.event.inputs.version }} \
-            bcs oci://ghcr.io/alinflorin/charts/bcs
-
-      - name: Remove kubeconfig file
-        if: always()
-        run: rm -rf ${{ github.workspace }}/kubeconfig.yaml || true
+    uses: ./.github/workflows/reusable-deploy.yaml
+    with:
+      env: ${{ inputs.environment }}
+      version: ${{ inputs.version }}
+      uninstall: false

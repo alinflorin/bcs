@@ -16,7 +16,7 @@ jobs:
     permissions:
       actions: read
       contents: read
-      security-events: none
+      security-events: write
       packages: write
     uses: ./.github/workflows/reusable-docker-ci.yaml
     with:
@@ -29,7 +29,7 @@ jobs:
     permissions:
       actions: read
       contents: read
-      security-events: none
+      security-events: write
       packages: write
     if: ${{ github.event.release.target_commitish == 'main' }}
     uses: ./.github/workflows/reusable-helm-ci.yaml
@@ -47,3 +47,4 @@ jobs:
     with:
       env: ${{ matrix.environment }}
       version: ${{ github.ref_name }}
+      uninstall: false
