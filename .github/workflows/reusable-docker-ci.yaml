@@ -61,7 +61,7 @@ jobs:
         if: ${{ inputs.scan == true }}
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: ${{ inputs.project }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}:${{ inputs.version }}
+          image-ref: ${{ inputs.push == true && 'ghcr.io/alinflorin/' || '' }}${{ inputs.project }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}:${{ inputs.version }}
           format: sarif
           output: trivy-${{ inputs.project }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}.sarif
           severity: HIGH,CRITICAL
