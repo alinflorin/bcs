@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', version: version });
+  res.json({ status: 'OK!', version: version });
 });
 
 app.get('/api/hello', (req, res) => {
