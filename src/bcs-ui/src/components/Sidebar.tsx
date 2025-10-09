@@ -44,7 +44,7 @@ export default function Sidebar({
         overflowX: "hidden",
       }}
     >
-      <Box sx={{ flex: "auto", overflow: "auto", minHeight: 0 }}>
+      <Box sx={{ flex: "auto", minHeight: 0 }}>
         <Box
           sx={{
             display: "flex",
@@ -78,24 +78,26 @@ export default function Sidebar({
           </ListItem>
         </List>
 
-        <Accordion defaultExpanded>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1-content"
-            id="panel1-header"
-          >
-            <Typography component="span">Chats</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <List>
-              <ListItem>
-                <ListItemButton component="a">
-                  <ListItemText primary="Chat 1" />
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </AccordionDetails>
-        </Accordion>
+        {open && (
+          <Accordion defaultExpanded>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              <Typography component="span">Chats</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <List>
+                <ListItem>
+                  <ListItemButton component="a">
+                    <ListItemText primary="Chat 1" />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </AccordionDetails>
+          </Accordion>
+        )}
       </Box>
 
       <Box
@@ -105,7 +107,7 @@ export default function Sidebar({
           alignItems: "center",
         }}
       >
-        <span>Name</span>
+        {open && <span>Name</span>}
         <Avatar sx={{ bgcolor: deepOrange[500] }}>N</Avatar>
       </Box>
     </Box>
