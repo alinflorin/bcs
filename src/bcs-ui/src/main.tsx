@@ -7,7 +7,11 @@ import Settings from "./routes/Settings.tsx";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 
 const theme = createTheme({
-  palette: { mode: "dark" }, // ChatGPT-like dark theme
+  palette: {
+    mode: 'dark',
+    primary: { main: '#00bfa5' },
+    background: { default: '#121212', paper: '#1e1e1e' },
+  },
 });
 
 createRoot(document.getElementById("root")!).render(
