@@ -4,9 +4,15 @@ import App from "./App.tsx";
 import { BrowserRouter, Route, Routes } from "react-router";
 import Home from "./routes/Home.tsx";
 import Settings from "./routes/Settings.tsx";
+import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+
+const theme = createTheme({
+  palette: { mode: "dark" }, // ChatGPT-like dark theme
+});
 
 createRoot(document.getElementById("root")!).render(
-
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
     <BrowserRouter>
       <Routes>
         <Route element={<App />}>
@@ -15,4 +21,5 @@ createRoot(document.getElementById("root")!).render(
         </Route>
       </Routes>
     </BrowserRouter>
+  </ThemeProvider>
 );
