@@ -77,7 +77,7 @@ export default function Sidebar({
         overflowX: "hidden",
       }}
     >
-      <Box sx={{ flex: "auto", overflow: "auto", minHeight: 0 }}>
+      <Box sx={{ flex: "auto", minHeight: 0 }}>
         <Box
           sx={{
             display: "flex",
