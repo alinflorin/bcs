@@ -1,18 +1,17 @@
-import type { PropsWithChildren } from "react"
-import { useAuth } from "react-oidc-context"
-
-
+import type { PropsWithChildren } from "react";
+import { useAuth } from "react-oidc-context";
 
 export default function Private(props: PropsWithChildren) {
- 
-  const auth = useAuth()
+  const auth = useAuth();
 
-  if (!auth.isAuthenticated){
-    auth.signinRedirect();
-    return null
-    
-
+  if (auth.isLoading) {
+    return null;
   }
 
-    return  props.children
+  if (!auth.isAuthenticated) {
+    auth.signinRedirect();
+    return null;
+  }
+
+  return props.children;
 }

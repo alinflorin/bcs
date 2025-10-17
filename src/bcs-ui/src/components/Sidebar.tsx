@@ -111,20 +111,25 @@ export default function Sidebar({
           </ListItem>
         </List>
 
-        <Accordion defaultExpanded>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} id="panel1-header">
-            <Typography component="span">Chats</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <List>
-              <ListItem>
-                <ListItemButton component="a">
-                  <ListItemText primary="Chat 1" />
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </AccordionDetails>
-        </Accordion>
+        {open && (
+          <Accordion defaultExpanded>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              id="panel1-header"
+            >
+              <Typography component="span">Chats</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <List>
+                <ListItem>
+                  <ListItemButton component="a">
+                    <ListItemText primary="Chat 1" />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </AccordionDetails>
+          </Accordion>
+        )}
       </Box>
 
       <Box
@@ -135,7 +140,7 @@ export default function Sidebar({
           alignItems: "center",
         }}
       >
-        <span>{user?.profile?.name ?? "Guest"}</span>
+        {open && <span>{user?.profile?.name ?? "Guest"}</span>}
         <Avatar sx={{ bgcolor: deepOrange[500] }}>
           {user?.profile?.name ? user.profile.name[0].toUpperCase() : " ?"}
         </Avatar>
@@ -179,10 +184,12 @@ export default function Sidebar({
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
           {user && (
-            <MenuItem onClick={() => {
-              handleClose();
-              router("/settings");
-            }}>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                router("/settings");
+              }}
+            >
               <ListItemIcon>
                 <Settings fontSize="small" />
               </ListItemIcon>
