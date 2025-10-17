@@ -1,5 +1,12 @@
 export default function Settings() {
-    return <>
-        settings
-    </>
+    return <div>
+    <p>Settings</p>
+    
+  
+    
+    </div>
 }
+
+
+
+

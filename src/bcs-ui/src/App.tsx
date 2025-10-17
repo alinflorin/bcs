@@ -2,10 +2,30 @@ import { useState } from "react";
 import { Box, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "./components/Sidebar";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
+import { useAuth } from "react-oidc-context";
 
 export default function App() {
   const [open, setOpen] = useState(true);
+  const auth = useAuth();
+  const router = useNavigate();
+
+  const handleLogout = async () => {
+    await auth.removeUser();
+    await router("/");
+  };
+
+  const handleLogin = async () => {
+    await auth.signinRedirect();
+  };
+
+  if (auth.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (auth.error) {
+    return <div>Oops... {auth.error.message}</div>;
+  }
 
   return (
     <Box
@@ -16,7 +36,13 @@ export default function App() {
         overflow: "hidden",
       }}
     >
-      <Sidebar open={open} onToggle={() => setOpen(!open)} />
+      <Sidebar
+        open={open}
+        onLogin={handleLogin}
+        onToggle={() => setOpen(!open)}
+        user={auth.user}
+        onLogout={handleLogout}
+      />
 
       <Box
         component="main"
@@ -27,12 +53,12 @@ export default function App() {
           marginLeft: 0,
           marginTop: 0,
           display: "flex",
-          height: '100%',
+          height: "100%",
           flexDirection: "column",
           alignItems: "flex-start",
         }}
       >
-        <Box sx={{width: '100%'}}>
+        <Box sx={{ width: "100%" }}>
           <IconButton
             sx={{
               display: { xs: "inline-flex", sm: "none" },
@@ -44,7 +70,14 @@ export default function App() {
           </IconButton>
         </Box>
 
-        <Box sx={{width: '100%', flex: 'auto', display: 'flex', flexDirection: 'column'}}>
+        <Box
+          sx={{
+            width: "100%",
+            flex: "auto",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <Outlet />
         </Box>
       </Box>
