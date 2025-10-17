@@ -33,6 +33,7 @@ import { deepOrange } from "@mui/material/colors";
 import type { User } from "oidc-client-ts";
 import React, { useState } from "react";
 import { version } from "../version";
+import axios from "axios";
 
 const drawerWidth = 240;
 
@@ -67,6 +68,14 @@ export default function Sidebar({
     setMenuOpen(false);
   };
 
+
+  const clickNevChat = async ()=>{
+    
+   const response = await axios.post('/api/chat/new')
+   console.log(response.data)
+   
+  }
+
   const drawerContent = (
     <Box
       sx={{
@@ -95,7 +104,7 @@ export default function Sidebar({
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="/chat/:id">
+            <ListItemButton onClick={clickNevChat}>
               <ListItemIcon>
                 <Chat />
               </ListItemIcon>

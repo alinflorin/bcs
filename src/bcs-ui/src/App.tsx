@@ -11,7 +11,9 @@ export default function App() {
   const router = useNavigate();
 
   const handleLogout = async () => {
-    await auth.removeUser();
+    await auth.signoutRedirect({
+      post_logout_redirect_uri: window.location.origin
+    });
     await router("/");
   };
 
