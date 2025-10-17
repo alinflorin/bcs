@@ -4,26 +4,40 @@ import App from "./App.tsx";
 import { BrowserRouter, Route, Routes } from "react-router";
 import Home from "./routes/Home.tsx";
 import Settings from "./routes/Settings.tsx";
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
-
-const theme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: { main: '#00bfa5' },
-    background: { default: '#121212', paper: '#1e1e1e' },
-  },
-});
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { AuthProvider } from "react-oidc-context";
+import Private from "./components/Private.tsx";
+import Chat from "./components/Chat.tsx";
+import oidcConfig from "./config/auth.ts";
+import theme from "./config/theme.ts";
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider theme={theme}>
     <CssBaseline />
-    <BrowserRouter>
-      <Routes>
-        <Route element={<App />}>
-          <Route index element={<Home />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider {...oidcConfig}>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<App />}>
+            <Route index element={<Home />} />
+            <Route
+              path="settings"
+              element={
+                <Private>
+                  <Settings />
+                </Private>
+              }
+            />
+            <Route
+              path="chat/:id"
+              element={
+                <Private>
+                  <Chat />
+                </Private>
+              }
+            />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   </ThemeProvider>
 );

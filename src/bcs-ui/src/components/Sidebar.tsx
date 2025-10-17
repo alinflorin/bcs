@@ -14,24 +14,58 @@ import {
   Typography,
   AccordionDetails,
   Avatar,
+  Menu,
+  MenuItem,
 } from "@mui/material";
-import { Home, Settings, ChevronLeft, ChevronRight } from "@mui/icons-material";
+import {
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  Logout,
+  Login,
+  Chat,
+  Search,
+} from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { deepOrange } from "@mui/material/colors";
+import type { User } from "oidc-client-ts";
+import React, { useState } from "react";
+import { version } from "../version";
 
 const drawerWidth = 240;
+
+type SlideProps = {
+  open: boolean;
+  onToggle: () => void;
+  user?: User | null;
+  onLogout?: () => Promise<void>;
+  onLogin?: () => Promise<void>;
+};
 
 export default function Sidebar({
   open,
   onToggle,
-}: {
-  open: boolean;
-  onToggle: () => void;
-}) {
+  user,
+  onLogin,
+  onLogout,
+}: SlideProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const router = useNavigate();
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    setMenuOpen(!menuOpen);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+    setMenuOpen(false);
+  };
 
   const drawerContent = (
     <Box
@@ -53,7 +87,7 @@ export default function Sidebar({
             p: 1,
           }}
         >
-          {open && <span>LOGO</span>}
+          {open && <span>LOGO {version}</span>}
           <IconButton onClick={onToggle}>
             {open ? <ChevronLeft /> : <ChevronRight />}
           </IconButton>
@@ -61,19 +95,19 @@ export default function Sidebar({
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="/">
+            <ListItemButton component={Link} to="/chat/:id">
               <ListItemIcon>
-                <Home />
+                <Chat />
               </ListItemIcon>
-              {open && <ListItemText primary="Home" />}
+              {open && <ListItemText primary="New Chat" />}
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="/settings">
+            <ListItemButton component={Link} to="">
               <ListItemIcon>
-                <Settings />
+                <Search />
               </ListItemIcon>
-              {open && <ListItemText primary="Settings" />}
+              {open && <ListItemText primary="Search" />}
             </ListItemButton>
           </ListItem>
         </List>
@@ -82,7 +116,6 @@ export default function Sidebar({
           <Accordion defaultExpanded>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1-content"
               id="panel1-header"
             >
               <Typography component="span">Chats</Typography>
@@ -101,14 +134,86 @@ export default function Sidebar({
       </Box>
 
       <Box
+        onClick={handleClick}
         sx={{
           display: "flex",
           justifyContent: "space-around",
           alignItems: "center",
         }}
       >
-        {open && <span>Name</span>}
-        <Avatar sx={{ bgcolor: deepOrange[500] }}>N</Avatar>
+        {open && <span>{user?.profile?.name ?? "Guest"}</span>}
+        <Avatar sx={{ bgcolor: deepOrange[500] }}>
+          {user?.profile?.name ? user.profile.name[0].toUpperCase() : " ?"}
+        </Avatar>
+
+        <Menu
+          anchorEl={anchorEl}
+          id="account-menu"
+          open={menuOpen}
+          aria-hidden="false"
+          onClose={handleClose}
+          onClick={handleClose}
+          slotProps={{
+            paper: {
+              elevation: 0,
+              sx: {
+                overflow: "visible",
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                mt: 1.5,
+                "& .MuiAvatar-root": {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                "&::before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: "background.paper",
+                  transform: "translateY(-50%) rotate(45deg)",
+                  zIndex: 0,
+                },
+              },
+            },
+          }}
+          transformOrigin={{ horizontal: "right", vertical: "top" }}
+          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        >
+          {user && (
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                router("/settings");
+              }}
+            >
+              <ListItemIcon>
+                <Settings fontSize="small" />
+              </ListItemIcon>
+              Settings
+            </MenuItem>
+          )}
+          {user && (
+            <MenuItem onClick={onLogout}>
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
+              Logout
+            </MenuItem>
+          )}
+          {!user && (
+            <MenuItem onClick={onLogin}>
+              <ListItemIcon>
+                <Login fontSize="small" />
+              </ListItemIcon>
+              Login
+            </MenuItem>
+          )}
+        </Menu>
       </Box>
     </Box>
   );
