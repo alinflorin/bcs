@@ -32,6 +32,7 @@ import { Link, useNavigate } from "react-router";
 import { deepOrange } from "@mui/material/colors";
 import type { User } from "oidc-client-ts";
 import React, { useState } from "react";
+import { version } from "../version";
 
 const drawerWidth = 240;
 
@@ -86,7 +87,7 @@ export default function Sidebar({
             p: 1,
           }}
         >
-          {open && <span>LOGO</span>}
+          {open && <span>LOGO {version}</span>}
           <IconButton onClick={onToggle}>
             {open ? <ChevronLeft /> : <ChevronRight />}
           </IconButton>
