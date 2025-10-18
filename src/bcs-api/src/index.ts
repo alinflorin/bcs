@@ -35,13 +35,14 @@ app.use(
   })
 );
 
+
 app.post("/api/chat/new", async (req, res) => {
-  const email = (req as any).auth["https://bcs-api/email"];
+  
   const chat = {
     isArchived: false,
     date: new Date().getTime(),
     title: "New Chat",
-    userEmail: email,
+    userEmail: req.auth!["https://bcs-api/email"],
   };
 
   await baza.collection("chats").insertOne(chat);
