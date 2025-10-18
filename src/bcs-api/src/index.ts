@@ -10,7 +10,7 @@ const url = `mongodb://${
   process.env.MONGODB_USERNAME
     ? process.env.MONGODB_USERNAME + `:` + process.env.MONGODB_PASSWORD
     : ``
-}${process.env.MONGODB_HOSTNAME}:27017/bcs`;
+}${process.env.MONGODB_HOSTNAME || "localhost"}:${process.env.MONGODB_PORT || 27017}/${process.env.MONGODB_DATABASE || "bcs"}`;
 const client = new MongoClient(url);
 const baza = client.db("bcs");
 
@@ -27,10 +27,10 @@ app.use(
       cache: true,
       rateLimit: true,
       jwksRequestsPerMinute: 5,
-      jwksUri: `https://dev-kpiuw0wghy7ta8x8.us.auth0.com/.well-known/jwks.json`,
+      jwksUri: process.env.OIDC_JWKS_URI || `https://dev-kpiuw0wghy7ta8x8.us.auth0.com/.well-known/jwks.json`,
     }),
-    audience: "https://bcs-api/",
-    issuer: `https://dev-kpiuw0wghy7ta8x8.us.auth0.com/`,
+    audience: process.env.OIDC_AUDIENCE || "https://bcs-api/",
+    issuer: process.env.OIDC_ISSUER || `https://dev-kpiuw0wghy7ta8x8.us.auth0.com/`,
     algorithms: ["RS256"],
   })
 );

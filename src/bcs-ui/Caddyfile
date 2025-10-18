@@ -19,4 +19,9 @@
     # Prevent content type sniffing
     X-Content-Type-Options "nosniff"
   }
+  
+  @envconfig {
+    path /env-config.js
+  }
+  header @envconfig Cache-Control "no-store"
 }

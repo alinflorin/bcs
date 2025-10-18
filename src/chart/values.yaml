@@ -2,6 +2,13 @@ environment: null
 
 arch: amd64
 
+oidc:
+  jwksUri: https://dev-kpiuw0wghy7ta8x8.us.auth0.com/.well-known/jwks.json
+  issuer: https://dev-kpiuw0wghy7ta8x8.us.auth0.com/
+  audience: https://bcs-api/
+  clientId: ZB6G0jz2KVW6acAmLhdibQ5ykL02YcBy
+  scopes: 'openid profile email offline_access api:use'
+
 ui:
   resources:
     requests:
@@ -61,6 +68,7 @@ qdrant:
 
 mongodb:
   enabled: true
+  port: '27017'
   username: bcs
   resources:
     limits:

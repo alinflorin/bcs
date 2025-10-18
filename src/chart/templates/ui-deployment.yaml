@@ -20,6 +20,15 @@ spec:
         - name: bcs-ui
           image: ghcr.io/alinflorin/bcs-ui-{{ .Values.arch }}:{{ .Chart.AppVersion }}
           imagePullPolicy: IfNotPresent
+          env:
+            - name: OIDC_ISSUER
+              value: {{ .Values.oidc.issuer }}
+            - name: OIDC_AUDIENCE
+              value: {{ .Values.oidc.audience }}
+            - name: OIDC_CLIENT_ID
+              value: {{ .Values.oidc.clientId }}
+            - name: OIDC_SCOPES
+              value: {{ .Values.oidc.scopes }}
           resources:
             {{- toYaml .Values.ui.resources | nindent 12 }}
           ports:

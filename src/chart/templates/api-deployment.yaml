@@ -39,13 +39,18 @@ spec:
               value: 'http://{{ .Release.Name }}-qdrant:6333'
             - name: NODE_ENV
               value: 'production'
+            - name: OIDC_JWKS_URI
+              value: {{ .Values.oidc.jwksUri }}
+            - name: OIDC_ISSUER
+              value: {{ .Values.oidc.issuer }}
+            - name: OIDC_AUDIENCE
+              value: {{ .Values.oidc.audience }}
             - name: 'MONGODB_HOSTNAME'
               value: '{{ .Release.Name }}-mongodb'
+            - name: 'MONGODB_PORT'
+              value: '{{ .Values.mongodb.port }}'
             - name: 'MONGODB_USERNAME'
-              valueFrom:
-                configMapKeyRef:
-                  name: bcs
-                  key: mongodbUsername
+              value: {{ .Values.mongodb.username }}
             - name: 'MONGODB_PASSWORD'
               valueFrom:
                 secretKeyRef:

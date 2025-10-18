@@ -25,5 +25,13 @@ FROM caddy:2-alpine
 ENV CADDY_TELEMETRY=off
 COPY --from=builder /app/dist /usr/share/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
+
+# Copy entrypoint + template
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+COPY env-config.js.template /usr/share/caddy/env-config.js.template
+RUN chmod +x /usr/bin/entrypoint.sh
+
 USER appuser
 EXPOSE 80
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
