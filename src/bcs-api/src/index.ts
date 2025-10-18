@@ -6,6 +6,9 @@ import errorHandler from "./middleware/error-handler";
 import notFoundHandler from "./middleware/not-found-handler";
 import jwtHandler from "./middleware/jwt-handler";
 import mongoDbDatabase from "./services/mongodb-service";
+import { Chat } from "./models/chat";
+import { ChatEntity } from "./entities/chat-entity";
+import { ObjectId } from "mongodb";
 
 const app = express();
 app.use(express.json());
@@ -23,16 +26,55 @@ app.use(
 
 app.post("/api/chat/new", async (req, res) => {
   
-  const chat = {
+  const chat: ChatEntity = {
     isArchived: false,
     date: new Date().getTime(),
     title: "New Chat",
     userEmail: req.auth!["https://bcs-api/email"],
   };
 
-  await mongoDbDatabase.collection("chats").insertOne(chat);
-  res.send(chat);
+  await mongoDbDatabase.collection<ChatEntity>("chats").insertOne(chat);
+  res.send({
+    date: chat.date,
+    isArchived: chat.isArchived,
+    title: chat.title,
+    userEmail:chat.userEmail,
+    _id: chat._id?.toString()
+  } as Chat);
 });
+
+
+
+
+app.get("/api/chat/:id", async (req, res)=>{
+
+  const id = new ObjectId( req.params.id)
+ 
+  const entity = await mongoDbDatabase.collection<ChatEntity>("chats").findOne({_id: id})
+
+  if (!entity) {
+    res.status(404).send({message: 'Not found'});
+    return;
+  }
+
+
+  const chat : Chat = {
+    date: entity.date,
+    isArchived: entity.isArchived,
+    title: entity.title,
+    userEmail: entity.userEmail,
+    _id: entity._id.toString()
+
+  } 
+
+  res.send(chat)
+
+})
+
+
+app.get("/api/messages/:chatId", async (req, res)=>{
+
+})
 
 
 
