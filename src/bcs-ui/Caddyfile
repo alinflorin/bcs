@@ -22,7 +22,7 @@
 
   # Serve runtime env-config.js from writable folder
   handle /env-config.js* {
-    root * /tmp/caddy-runtime
+    root * /caddy-runtime
     file_server
     header {
       Cache-Control "no-store"
