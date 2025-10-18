@@ -30,7 +30,7 @@ COPY Caddyfile /etc/caddy/Caddyfile
 COPY entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
-RUN mkdir -p /caddy-runtime && chown appuser:appuser /caddy-runtime
+RUN mkdir -p /caddy-runtime && chown appuser /caddy-runtime
 COPY env-config.js.template /caddy-runtime/env-config.js.template
 
 USER appuser
