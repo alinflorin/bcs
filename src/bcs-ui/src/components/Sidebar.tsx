@@ -23,7 +23,7 @@ import {
   ChevronRight,
   Logout,
   Login,
-  Chat,
+  Chat as ChatIcon,
   Search,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
@@ -34,6 +34,7 @@ import type { User } from "oidc-client-ts";
 import React, { useState } from "react";
 import { version } from "../version";
 import axios from "axios";
+import { Chat } from "../models/chat";
 
 const drawerWidth = 240;
 
@@ -71,8 +72,9 @@ export default function Sidebar({
 
   const clickNevChat = async ()=>{
     
-   const response = await axios.post('/api/chat/new')
+   const response = await axios.post<Chat>('/api/chat/new')
    console.log(response.data)
+   router('/chat/'+ response.data._id)
    
   }
 
@@ -106,7 +108,7 @@ export default function Sidebar({
           <ListItem disablePadding>
             <ListItemButton onClick={clickNevChat}>
               <ListItemIcon>
-                <Chat />
+                <ChatIcon />
               </ListItemIcon>
               {open && <ListItemText primary="New Chat" />}
             </ListItemButton>
