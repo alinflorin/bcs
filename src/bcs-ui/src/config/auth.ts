@@ -2,7 +2,7 @@ import { UserManager } from "oidc-client-ts";
 import type { AuthProviderProps } from "react-oidc-context";
 
 const oidcConfig: AuthProviderProps = {
-  authority: (window as any)._env_?.OIDC_ISSUER || "https://dev-kpiuw0wghy7ta8x8.us.auth0.com",
+  authority: (window as any)._env_?.OIDC_ISSUER || "https://dev-kpiuw0wghy7ta8x8.us.auth0.com/",
   client_id: (window as any)._env_?.OIDC_CLIENT_ID || "ZB6G0jz2KVW6acAmLhdibQ5ykL02YcBy",
   redirect_uri: window.location.origin,
   response_type: "code",
