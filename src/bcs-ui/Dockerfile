@@ -27,7 +27,7 @@ COPY entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
 RUN mkdir -p /caddy-runtime \
-    && chown -R 1000:1000 /caddy-runtime
+    && chown -R 1001:1001 /caddy-runtime
 COPY env-config.js.template /caddy-runtime/env-config.js.template
 COPY Caddyfile /etc/caddy/Caddyfile
 ENV CADDY_TELEMETRY=off
