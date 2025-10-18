@@ -33,7 +33,7 @@ RUN chmod +x /usr/bin/entrypoint.sh
 RUN mkdir -p /tmp/caddy-runtime
 COPY env-config.js.template /tmp/caddy-runtime/env-config.js.template
 
-USER appuser
+# USER appuser
 EXPOSE 80
 
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]
