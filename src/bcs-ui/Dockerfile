@@ -22,18 +22,20 @@ RUN find dist -type f \( \
 done
 
 FROM caddy:2-alpine
-ENV CADDY_TELEMETRY=off
-COPY --from=builder /app/dist /usr/share/caddy
-COPY Caddyfile /etc/caddy/Caddyfile
-
+RUN addgroup -S appuser && adduser -S appuser -G appuser
 # Copy entrypoint + template
 COPY entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
-RUN mkdir -p /caddy-runtime
+RUN mkdir -p /caddy-runtime \
+    && chown -R appuser:appuser /caddy-runtime
 COPY env-config.js.template /caddy-runtime/env-config.js.template
+COPY Caddyfile /etc/caddy/Caddyfile
+ENV CADDY_TELEMETRY=off
 
-# USER appuser
+COPY --from=builder /app/dist /usr/share/caddy
+
+USER appuser
 EXPOSE 80
 
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]
