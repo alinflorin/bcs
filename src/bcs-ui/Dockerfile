@@ -27,13 +27,12 @@ RUN apk update && apk add --no-cache gettext
 COPY entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
-RUN mkdir -p /caddy-runtime \
-    && chown -R 1001:1001 /caddy-runtime
-COPY env-config.js.template /caddy-runtime/env-config.js.template
+RUN chown -R 1001:1001 /usr/share/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
 ENV CADDY_TELEMETRY=off
 
 COPY --from=builder /app/dist /usr/share/caddy
+COPY env-config.js.template /usr/share/caddy/env-config.js.template
 
 EXPOSE 80
 

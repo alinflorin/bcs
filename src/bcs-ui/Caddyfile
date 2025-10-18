@@ -19,13 +19,7 @@
     # Prevent content type sniffing
     X-Content-Type-Options "nosniff"
   }
-
-  # Serve runtime env-config.js from writable folder
-  handle /env-config.js* {
-    root * /caddy-runtime
-    file_server
-    header {
-      Cache-Control "no-store"
-    }
-  }
+  
+  @envConfig file /env-config.js
+  header @envConfig Cache-Control "no-store, must-revalidate"
 }
