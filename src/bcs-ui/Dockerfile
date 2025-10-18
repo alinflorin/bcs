@@ -22,6 +22,7 @@ RUN find dist -type f \( \
 done
 
 FROM caddy:2-alpine
+RUN apk update && apk add --no-cache gettext
 # Copy entrypoint + template
 COPY entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
