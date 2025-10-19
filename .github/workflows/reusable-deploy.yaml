@@ -62,7 +62,7 @@ jobs:
       - name: Deploy to ${{ inputs.env }} environment with Helm
         if: ${{ inputs.uninstall == false }}
         run: |
-          helm upgrade --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --install --namespace bcs-${{ inputs.env }} --create-namespace --values src/chart/values-${{ inputs.env }}.yaml --version=${{ inputs.version }} bcs oci://ghcr.io/alinflorin/charts/bcs
+          helm upgrade --kubeconfig ${{ github.workspace }}/kubeconfig.yaml --install --atomic --namespace bcs-${{ inputs.env }} --create-namespace --values src/chart/values-${{ inputs.env }}.yaml --version=${{ inputs.version }} bcs oci://ghcr.io/alinflorin/charts/bcs
 
       - name: Uninstall from ${{ inputs.env }} environment with Helm
         if: ${{ inputs.uninstall == true }}
