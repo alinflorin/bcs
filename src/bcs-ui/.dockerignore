@@ -28,3 +28,4 @@ Dockerfile
 .dockerignore
 .git
 README.md
+public/env-config.js
