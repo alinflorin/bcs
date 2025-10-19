@@ -34,8 +34,6 @@ import { deepOrange } from "@mui/material/colors";
 import type { User } from "oidc-client-ts";
 import React, { useState } from "react";
 import { version } from "../version";
-import axios from "axios";
-import { Chat } from "../models/chat";
 
 const drawerWidth = 240;
 
@@ -68,11 +66,6 @@ export default function Sidebar({
   const handleClose = () => {
     setAnchorEl(null);
     setMenuOpen(false);
-  };
-
-  const clickNewChat = async () => {
-    const response = await axios.post<Chat>("/api/chat/new");
-    router("/chat/" + response.data._id);
   };
 
   const drawerContent = (
@@ -110,33 +103,27 @@ export default function Sidebar({
               {open && <ListItemText primary="Home" />}
             </ListItemButton>
           </ListItem>
-          {user && (
-            <ListItem disablePadding>
-              <ListItemButton onClick={clickNewChat}>
-                <ListItemIcon>
-                  <ChatIcon />
-                </ListItemIcon>
-                {open && <ListItemText primary="New Chat" />}
-              </ListItemButton>
-            </ListItem>
-          )}
-          {user && (
-            <ListItem disablePadding>
-              <ListItemButton component={Link} to="">
-                <ListItemIcon>
-                  <Search />
-                </ListItemIcon>
-                {open && <ListItemText primary="Search" />}
-              </ListItemButton>
-            </ListItem>
-          )}
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="/new-chat">
+              <ListItemIcon>
+                <ChatIcon />
+              </ListItemIcon>
+              {open && <ListItemText primary="New Chat" />}
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="">
+              <ListItemIcon>
+                <Search />
+              </ListItemIcon>
+              {open && <ListItemText primary="Search" />}
+            </ListItemButton>
+          </ListItem>
         </List>
 
         {user && open && (
           <Accordion defaultExpanded>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-            >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography component="span">Chats</Typography>
             </AccordionSummary>
             <AccordionDetails>

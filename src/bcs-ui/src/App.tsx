@@ -13,23 +13,15 @@ export default function App() {
 
   const handleLogout = async () => {
     await auth.signoutRedirect({
-      post_logout_redirect_uri: window.location.origin
+      post_logout_redirect_uri: window.location.origin,
     });
     await router("/");
   };
 
   const handleLogin = async () => {
-    sessionStorage.setItem('postLoginRedirect', location.pathname);
+    sessionStorage.setItem("postLoginRedirect", location.pathname);
     await auth.signinRedirect();
   };
-
-  if (auth.isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (auth.error) {
-    return <div>Oops... {auth.error.message}</div>;
-  }
 
   return (
     <Box
@@ -82,7 +74,9 @@ export default function App() {
             flexDirection: "column",
           }}
         >
-          <Outlet />
+          {auth.error && <div>Oops... {auth.error.message}</div>}
+          {auth.isLoading && <div>Logging in...</div>}
+          {!auth.error && !auth.isLoading && <Outlet />}
         </Box>
       </Box>
     </Box>

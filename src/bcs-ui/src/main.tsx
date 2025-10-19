@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import './services/interceptor';
+import "./services/interceptor";
 import App from "./App.tsx";
 import { BrowserRouter, Route, Routes } from "react-router";
 import Home from "./routes/Home.tsx";
@@ -8,44 +8,51 @@ import Settings from "./routes/Settings.tsx";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AuthProvider } from "react-oidc-context";
 import Private from "./components/Private.tsx";
-import Chat from "./components/Chat.tsx";
+import ViewChat from "./routes/ViewChat.tsx";
 import oidcConfig from "./config/auth.ts";
 import theme from "./config/theme.ts";
 import OauthCallback from "./routes/OauthCallback.tsx";
+import NotificationsProvider from "./providers/notifications-provider.tsx";
+import NewChat from "./routes/NewChat.tsx";
 
 createRoot(document.getElementById("root")!).render(
-  <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <AuthProvider {...oidcConfig}>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<App />}>
-            <Route index element={<Home />} />
-            <Route
-              path="oauth-callback"
-              element={
-                <OauthCallback />
-              }
-            />
-            <Route
-              path="settings"
-              element={
-                <Private>
-                  <Settings />
-                </Private>
-              }
-            />
-            <Route
-              path="chat/:id"
-              element={
-                <Private>
-                  <Chat />
-                </Private>
-              }
-            />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
-  </ThemeProvider>
+  <NotificationsProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AuthProvider {...oidcConfig}>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<App />}>
+              <Route index element={<Home />} />
+              <Route path="oauth-callback" element={<OauthCallback />} />
+              <Route
+                path="settings"
+                element={
+                  <Private>
+                    <Settings />
+                  </Private>
+                }
+              />
+              <Route
+                path="new-chat"
+                element={
+                  <Private>
+                    <NewChat />
+                  </Private>
+                }
+              />
+              <Route
+                path="chat/:id"
+                element={
+                  <Private>
+                    <ViewChat />
+                  </Private>
+                }
+              />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
+  </NotificationsProvider>
 );
