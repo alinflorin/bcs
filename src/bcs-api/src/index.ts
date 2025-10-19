@@ -49,7 +49,7 @@ app.get("/api/chat/:id", async (req, res)=>{
 
   const id = new ObjectId( req.params.id)
  
-  const entity = await mongoDbDatabase.collection<ChatEntity>("chats").findOne({_id: id, userEmail: req.auth?.["https://bcs-api/email"]!})
+  const entity = await mongoDbDatabase.collection<ChatEntity>("chats").findOne({_id: id, userEmail: req.auth!["https://bcs-api/email"]!})
 
   if (!entity) {
     res.status(404).send({message: 'Not found'});
