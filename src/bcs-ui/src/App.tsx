@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Box, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "./components/Sidebar";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import { useAuth } from "react-oidc-context";
 
 export default function App() {
   const [open, setOpen] = useState(true);
   const auth = useAuth();
   const router = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     await auth.signoutRedirect({
@@ -18,6 +19,7 @@ export default function App() {
   };
 
   const handleLogin = async () => {
+    sessionStorage.setItem('postLoginRedirect', location.pathname);
     await auth.signinRedirect();
   };
 

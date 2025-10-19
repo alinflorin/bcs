@@ -25,6 +25,7 @@ import {
   Login,
   Chat as ChatIcon,
   Search,
+  Home,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -42,8 +43,8 @@ type SlideProps = {
   open: boolean;
   onToggle: () => void;
   user?: User | null;
-  onLogout?: () => Promise<void>;
-  onLogin?: () => Promise<void>;
+  onLogout: () => Promise<void>;
+  onLogin: () => Promise<void>;
 };
 
 export default function Sidebar({
@@ -69,14 +70,10 @@ export default function Sidebar({
     setMenuOpen(false);
   };
 
-
-  const clickNevChat = async ()=>{
-    
-   const response = await axios.post<Chat>('/api/chat/new')
-   console.log(response.data)
-   router('/chat/'+ response.data._id)
-   
-  }
+  const clickNewChat = async () => {
+    const response = await axios.post<Chat>("/api/chat/new");
+    router("/chat/" + response.data._id);
+  };
 
   const drawerContent = (
     <Box
@@ -98,7 +95,7 @@ export default function Sidebar({
             p: 1,
           }}
         >
-          {open && <span>LOGO {version}</span>}
+          {open && <span>BCS {version}</span>}
           <IconButton onClick={onToggle}>
             {open ? <ChevronLeft /> : <ChevronRight />}
           </IconButton>
@@ -106,35 +103,46 @@ export default function Sidebar({
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton onClick={clickNevChat}>
+            <ListItemButton component={Link} to="/">
               <ListItemIcon>
-                <ChatIcon />
+                <Home />
               </ListItemIcon>
-              {open && <ListItemText primary="New Chat" />}
+              {open && <ListItemText primary="Home" />}
             </ListItemButton>
           </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="">
-              <ListItemIcon>
-                <Search />
-              </ListItemIcon>
-              {open && <ListItemText primary="Search" />}
-            </ListItemButton>
-          </ListItem>
+          {user && (
+            <ListItem disablePadding>
+              <ListItemButton onClick={clickNewChat}>
+                <ListItemIcon>
+                  <ChatIcon />
+                </ListItemIcon>
+                {open && <ListItemText primary="New Chat" />}
+              </ListItemButton>
+            </ListItem>
+          )}
+          {user && (
+            <ListItem disablePadding>
+              <ListItemButton component={Link} to="">
+                <ListItemIcon>
+                  <Search />
+                </ListItemIcon>
+                {open && <ListItemText primary="Search" />}
+              </ListItemButton>
+            </ListItem>
+          )}
         </List>
 
-        {open && (
+        {user && open && (
           <Accordion defaultExpanded>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
-              id="panel1-header"
             >
               <Typography component="span">Chats</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <List>
                 <ListItem>
-                  <ListItemButton component="a">
+                  <ListItemButton component={Link} to={"/chat/1"}>
                     <ListItemText primary="Chat 1" />
                   </ListItemButton>
                 </ListItem>
@@ -159,7 +167,6 @@ export default function Sidebar({
 
         <Menu
           anchorEl={anchorEl}
-          id="account-menu"
           open={menuOpen}
           aria-hidden="false"
           onClose={handleClose}

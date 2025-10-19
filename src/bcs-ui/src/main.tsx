@@ -11,6 +11,7 @@ import Private from "./components/Private.tsx";
 import Chat from "./components/Chat.tsx";
 import oidcConfig from "./config/auth.ts";
 import theme from "./config/theme.ts";
+import OauthCallback from "./routes/OauthCallback.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider theme={theme}>
@@ -20,6 +21,12 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route element={<App />}>
             <Route index element={<Home />} />
+            <Route
+              path="oauth-callback"
+              element={
+                <OauthCallback />
+              }
+            />
             <Route
               path="settings"
               element={

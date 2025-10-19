@@ -4,7 +4,7 @@ import type { AuthProviderProps } from "react-oidc-context";
 const oidcConfig: AuthProviderProps = {
   authority: (window as any)._env_?.OIDC_ISSUER || "https://dev-kpiuw0wghy7ta8x8.us.auth0.com/",
   client_id: (window as any)._env_?.OIDC_CLIENT_ID || "ZB6G0jz2KVW6acAmLhdibQ5ykL02YcBy",
-  redirect_uri: window.location.origin,
+  redirect_uri: window.location.origin + '/oauth-callback',
   response_type: "code",
   extraQueryParams: {
     audience: (window as any)._env_?.OIDC_AUDIENCE || 'https://bcs-api/'
