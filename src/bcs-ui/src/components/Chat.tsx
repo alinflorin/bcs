@@ -15,7 +15,7 @@ export default function Chat() {
         console.log(response.data)
       })()
 
-     }, [])
+     }, [params.id])
     
 
 
