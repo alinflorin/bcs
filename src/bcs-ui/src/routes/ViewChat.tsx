@@ -173,6 +173,12 @@ export default function ViewChat() {
               <OutlinedInput
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
+                onKeyDown={async (e)=>{
+                  if (e.key === "Enter" && !e.shiftKey){
+                    e.preventDefault() //prevent newline
+                    await handleSend()
+                  }
+                }}
                 endAdornment={
                   <InputAdornment position="end">
                     <Button
