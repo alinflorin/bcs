@@ -7,7 +7,6 @@ import { Box, CircularProgress } from "@mui/material";
 
 export default function NewChat() {
   const router = useNavigate();
-
   const snackbar = useSnackbar();
 
   useEffect(() => {

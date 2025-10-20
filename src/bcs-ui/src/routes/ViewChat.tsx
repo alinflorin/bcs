@@ -4,58 +4,238 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
+  Typography,
+  Paper,
+  Button,
 } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router";
 import { Chat } from "../models/chat";
 import { useSnackbar } from "notistack";
+import { Message } from "../models/message";
 
 export default function ViewChat() {
   const params = useParams();
   const snackbar = useSnackbar();
 
   const [chat, setChat] = useState<Chat | undefined>();
+  const [messages, setMessages] = useState<Message[]>([]); // 👈 null means "not loaded yet"
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [inputText, setInputText] = useState(""); // For the send input
 
+
+
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  // Fetch chat + messages
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get<Chat>("/api/chat/" + params.id);
-        setChat(response.data);
+        const [chatResponse, messageResponse] = await Promise.all([
+          axios.get<Chat>("/api/chat/" + params.id),
+          axios.get<Message[]>("/api/messages/" + params.id),
+        ]);
+
+        setChat(chatResponse.data);
+        setMessages(messageResponse.data || []); // fallback to empty array
+        // setMessages([
+        //   {
+        //     chatId: '68f60b33f19b9481eb02ecf6',
+        //     date: 1760971523123,
+        //     isFromAi: true,
+        //     text: 'From agent',
+        //     _id: '68f60b33f19b9481eb02ecee'
+        //   },
+        //   {
+        //     chatId: '68f60b33f19b9481eb02ecf6',
+        //     date: 1760971523124,
+        //     isFromAi: false,
+        //     text: 'From human',
+        //     _id: '68f60b33f19b9481eb02eced'
+        //   }
+        // ]);
       } catch (e: any) {
         console.error(e);
         snackbar.enqueueSnackbar(e.response?.data?.message || "Error", {
-          variant: 'error'
+          variant: "error",
         });
+        setMessages([]); // fallback to empty array if error
       }
     })();
   }, [params.id, snackbar]);
 
-  return (
-    <>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100%",
-        }}
-      >
-        <h2>{chat?.title}</h2>
-        <p>What are you working on?</p>
+  const hasMessages = messages && messages.length > 0;
 
-        <FormControl fullWidth sx={{ m: 1 }}>
-          <InputLabel htmlFor="outlined-adornment-amount">
-            Ask anything
-          </InputLabel>
-          <OutlinedInput
-            id="outlined-adornment-amount"
-            startAdornment={<InputAdornment position="start">+</InputAdornment>}
-            label="Amount"
-          />
-        </FormControl>
-      </Box>
-    </>
+  const handleSend = async ()=>{
+    if(!inputText.trim()) return;
+    const myMessage: Message = {
+      isFromAi: false,
+      chatId: params.id!,
+      text: inputText,
+      date: new Date().getTime()
+    };
+    setMessages(m => [...m!, myMessage]);
+    try{
+      const response = await axios.post<Message>("/api/messages", {
+        
+        chatId: params.id!,
+        text: inputText,
+
+      } as Message)
+
+      setMessages((prev)=> [...(prev || []), response.data])
+      setInputText("")  //clear input 
+
+    }catch(e: any){
+      snackbar.enqueueSnackbar(e.response?.data?.message || 'Failed to send', {
+        variant: "error"
+      })
+    }
+  }
+
+  return (
+   <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
+      {/* --- If there are messages --- */}
+      {hasMessages ? (
+        <>
+          {/* Chat header */}
+          <Box
+            sx={{
+              textAlign: "center",
+              p: 2,
+              borderBottom: "1px solid #eee",
+            }}
+          >
+            <Typography variant="h6" color="text.secondary">
+              {chat?.title}
+            </Typography>
+          </Box>
+
+          {/* Scrollable messages */}
+          <Box
+            sx={{
+              flex: 1,
+              overflowY: "auto",
+              p: 3,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}
+          >
+            {messages.map((m) => (
+              <Box
+                key={m._id}
+                sx={{
+                  display: "flex",
+                  justifyContent: m.isFromAi ? "flex-start" : "flex-end",
+                }}
+              >
+                <Paper
+                  elevation={1}
+                  sx={{
+                    p: 2,
+                    borderRadius: 3,
+                    maxWidth: "75%",
+                    backgroundColor: m.isFromAi ? "#ffffff" : "#0b93f6",
+                    color: m.isFromAi ? "black" : "white",
+                  }}
+                >
+                  <Typography variant="body1">{m.text}</Typography>
+                </Paper>
+              </Box>
+            ))}
+            <div ref={messagesEndRef} />
+          </Box>
+
+          {/* Fixed bottom input with send button */}
+          <Box
+            sx={{
+              position: "sticky",
+              bottom: 0,
+              borderTop: "1px solid #e0e0e0",
+              p: 2,
+            }}
+          >
+            <FormControl fullWidth sx={{ borderRadius: 3 }}>
+              <InputLabel>Ask anything</InputLabel>
+              <OutlinedInput
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSend}
+                      disabled={!inputText.trim()}
+                    >
+                      Send
+                    </Button>
+                  </InputAdornment>
+                }
+                label="Ask anything"
+              />
+            </FormControl>
+          </Box>
+        </>
+      ) : (
+        // --- If there are NO messages, show centered input only ---
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            px: 2,
+          }}
+        >
+          <Typography variant="h4" mb={3}>
+            What are you working on?
+          </Typography>
+
+          <FormControl sx={{ width: "60%", maxWidth: 600 }}>
+            <InputLabel>Ask anything</InputLabel>
+           <OutlinedInput
+  value={inputText}
+  onChange={(e) => setInputText(e.target.value)}
+  onKeyDown={async(e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent new line
+      await handleSend();
+    }
+  }}
+  endAdornment={
+    <InputAdornment position="end">
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleSend}
+        disabled={!inputText.trim()}
+      >
+        Send
+      </Button>
+    </InputAdornment>
+  }
+  label="Ask anything"
+/>
+          </FormControl>
+        </Box>
+      )}
+    </Box>
+
   );
 }
