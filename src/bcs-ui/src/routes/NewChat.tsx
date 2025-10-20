@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Chat } from "../models/chat";
 import { useEffect } from "react";
 import { useSnackbar } from "notistack";
+import { Box, CircularProgress } from "@mui/material";
 
 export default function NewChat() {
   const router = useNavigate();
@@ -22,5 +23,5 @@ export default function NewChat() {
     })();
   }, [router, snackbar]);
 
-  return <div>Creating new chat...</div>;
+  return <Box sx={{ display: 'flex' }}><CircularProgress /> </Box>;
 }

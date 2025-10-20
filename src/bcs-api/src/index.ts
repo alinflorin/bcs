@@ -71,7 +71,21 @@ app.get("/api/chat/:id", async (req, res)=>{
 })
 
 
-app.get("/api/messages/:chatId", async (req, res)=>{
+app.get('/api/chats', async (req, res)=>{
+
+  const userEmail = req.auth!["https://bcs-api/email"]
+
+  const entities = await mongoDbDatabase.collection<ChatEntity>('chats').find({userEmail: userEmail}).toArray();
+
+  const chats : Chat[] = entities.map(e => ({
+    date: e.date,
+    isArchived: e.isArchived,
+    title: e.title,
+    userEmail: e.userEmail,
+    _id: e._id.toString()
+  }));
+
+  res.send(chats)
 
 })
 
