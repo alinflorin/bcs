@@ -17,11 +17,16 @@ import axios from "axios";
 import { useSnackbar } from "notistack";
 import { Chat } from "../models/chat";
 import { Delete } from "@mui/icons-material";
+import { useListener } from "react-bus";
 
 export default function ChatList() {
   const snackbar = useSnackbar();
 
   const [state, setState] = useState<Chat[]>([]);
+
+  useListener('newChatCreated', (e)=> {
+    setState(prev => [e as Chat, ...prev]);
+  });
 
   useEffect(() => {
     (async () => {

@@ -15,53 +15,56 @@ import OauthCallback from "./routes/OauthCallback.tsx";
 import NotificationsProvider from "./providers/notifications-provider.tsx";
 import NewChat from "./routes/NewChat.tsx";
 import Search from "./routes/Search.tsx";
+import { Provider as BusProvider } from "react-bus";
 
 createRoot(document.getElementById("root")!).render(
-  <NotificationsProvider>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider {...oidcConfig}>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<App />}>
-              <Route index element={<Home />} />
-              <Route path="oauth-callback" element={<OauthCallback />} />
-              <Route
-                path="settings"
-                element={
-                  <Private>
-                    <Settings />
-                  </Private>
-                }
-              />
-              <Route
-                path="new-chat"
-                element={
-                  <Private>
-                    <NewChat />
-                  </Private>
-                }
-              />
-              <Route
-                path="chat/:id"
-                element={
-                  <Private>
-                    <ViewChat />
-                  </Private>
-                }
-              />
-               <Route
-                path="search"
-                element={
-                  <Private>
-                    <Search />
-                  </Private>
-                }
-              />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
-  </NotificationsProvider>
+  <BusProvider>
+    <NotificationsProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider {...oidcConfig}>
+          <BrowserRouter>
+            <Routes>
+              <Route element={<App />}>
+                <Route index element={<Home />} />
+                <Route path="oauth-callback" element={<OauthCallback />} />
+                <Route
+                  path="settings"
+                  element={
+                    <Private>
+                      <Settings />
+                    </Private>
+                  }
+                />
+                <Route
+                  path="new-chat"
+                  element={
+                    <Private>
+                      <NewChat />
+                    </Private>
+                  }
+                />
+                <Route
+                  path="chat/:id"
+                  element={
+                    <Private>
+                      <ViewChat />
+                    </Private>
+                  }
+                />
+                <Route
+                  path="search"
+                  element={
+                    <Private>
+                      <Search />
+                    </Private>
+                  }
+                />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
+    </NotificationsProvider>
+  </BusProvider>
 );
