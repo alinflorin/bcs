@@ -109,11 +109,11 @@ export default function Sidebar({
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="">
+            <ListItemButton component={Link} to="/search">
               <ListItemIcon>
                 <Search />
               </ListItemIcon>
-              {open && <ListItemText primary="Search" />}
+              {open && <ListItemText primary="Search Chat" />}
             </ListItemButton>
           </ListItem>
         </List>

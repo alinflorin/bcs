@@ -8,10 +8,11 @@ import jwtHandler from "./middleware/jwt-handler";
 import mongoDbDatabase from "./services/mongodb-service";
 import { Chat } from "./models/chat";
 import { ChatEntity } from "./entities/chat-entity";
-import { ObjectId } from "mongodb";
+import { Filter, ObjectId, SortDirection } from "mongodb";
 import { MessageEntity } from "./entities/message-entity";
 import { Message } from "./models/message";
 import messageValidator from "./validators/message-validator";
+
 
 
 
@@ -75,11 +76,38 @@ app.get("/api/chat/:id", async (req, res)=>{
 })
 
 
+//    /api/chats?limit=100&sort=title&dir=-1
+
 app.get('/api/chats', async (req, res)=>{
 
   const userEmail = req.auth!["https://bcs-api/email"]
 
-  const entities = await mongoDbDatabase.collection<ChatEntity>('chats').find({userEmail: userEmail, isArchived:false}).toArray();
+  let filter: Filter<ChatEntity> = {userEmail: userEmail, isArchived:false};
+
+  if (req.query.search) {
+    filter.title = {$regex: req.query.search!.toString(), ignoreCase: true};
+  }
+
+  let query = mongoDbDatabase.collection<ChatEntity>('chats').find(filter)
+
+
+  if (req.query.sort) {
+    query = query.sort({
+      [req.query.sort!.toString()]: (req.query.dir || 1) as SortDirection
+    });
+  } else {
+    query = query.sort({date: -1});
+  }
+
+  if (req.query.skip) {
+    query = query.skip(+req.query.skip);
+  }
+
+  if (req.query.limit){
+    query = query.limit(+req.query.limit)
+  }
+
+  const entities = await query.toArray();
 
   const chats : Chat[] = entities.map(e => ({
     date: e.date,
@@ -92,6 +120,9 @@ app.get('/api/chats', async (req, res)=>{
   res.send(chats)
 
 })
+
+
+
 
 
 

@@ -14,6 +14,7 @@ import theme from "./config/theme.ts";
 import OauthCallback from "./routes/OauthCallback.tsx";
 import NotificationsProvider from "./providers/notifications-provider.tsx";
 import NewChat from "./routes/NewChat.tsx";
+import Search from "./routes/Search.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <NotificationsProvider>
@@ -46,6 +47,14 @@ createRoot(document.getElementById("root")!).render(
                 element={
                   <Private>
                     <ViewChat />
+                  </Private>
+                }
+              />
+               <Route
+                path="search"
+                element={
+                  <Private>
+                    <Search />
                   </Private>
                 }
               />
