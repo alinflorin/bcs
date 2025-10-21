@@ -76,50 +76,104 @@ app.get("/api/chat/:id", async (req, res)=>{
 })
 
 
-//    /api/chats?limit=100&sort=title&dir=-1
+app.get('/api/chats', async (req, res) => {
+  const userEmail = req.auth!["https://bcs-api/email"];
+  const { search, sort, dir, skip, limit } = req.query;
 
-app.get('/api/chats', async (req, res)=>{
+  const chatsCollection = mongoDbDatabase.collection<ChatEntity>('chats');
 
-  const userEmail = req.auth!["https://bcs-api/email"]
+  const searchStr = search?.toString();
 
-  let filter: Filter<ChatEntity> = {userEmail: userEmail, isArchived:false};
+  const pipeline: any[] = [
+    {
+      $match: {
+        userEmail,
+        isArchived: false
+      }
+    },
+    // Convert _id -> string for lookup
+    {
+      $addFields: {
+        _idStr: { $toString: "$_id" }
+      }
+    },
+    // Join messages by chatId (string)
+    {
+      $lookup: {
+        from: "messages",
+        let: { chatIdStr: "$_idStr" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$chatId", "$$chatIdStr"] }
+            }
+          }
+        ],
+        as: "messages"
+      }
+    }
+  ];
 
-  if (req.query.search) {
-    filter.title = {$regex: req.query.search!.toString(), ignoreCase: true};
+  // Only apply search if provided
+  if (searchStr) {
+    pipeline.push(
+      { $unwind: { path: "$messages", preserveNullAndEmptyArrays: true } },
+      {
+        $match: {
+          $or: [
+            { title: { $regex: searchStr, $options: "i" } },
+            { "messages.text": { $regex: searchStr, $options: "i" } }
+          ]
+        }
+      },
+      {
+        $group: {
+          _id: "$_id",
+          date: { $first: "$date" },
+          title: { $first: "$title" },
+          userEmail: { $first: "$userEmail" },
+          isArchived: { $first: "$isArchived" },
+          searchMessagesResult: {
+            $push: {
+              $cond: [
+                { $regexMatch: { input: "$messages.text", regex: searchStr, options: "i" } },
+                {
+                  _id: { $toString: "$messages._id" },
+                  text: "$messages.text",
+                  date: "$messages.date",
+                  isFromAi: "$messages.isFromAi"
+                },
+                "$$REMOVE"
+              ]
+            }
+          }
+        }
+      }
+    );
   }
 
-  let query = mongoDbDatabase.collection<ChatEntity>('chats').find(filter)
+  // Sorting and pagination
+  const sortField = sort ? sort.toString() : 'date';
+  const sortDir: 1 | -1 = dir && dir.toString() === 'asc' ? 1 : -1;
+  pipeline.push({ $sort: { [sortField]: sortDir } });
+  if (skip) pipeline.push({ $skip: +skip });
+  if (limit) pipeline.push({ $limit: +limit });
 
+  const entities = await chatsCollection.aggregate(pipeline).toArray();
 
-  if (req.query.sort) {
-    query = query.sort({
-      [req.query.sort!.toString()]: (req.query.dir || 1) as SortDirection
-    });
-  } else {
-    query = query.sort({date: -1});
-  }
-
-  if (req.query.skip) {
-    query = query.skip(+req.query.skip);
-  }
-
-  if (req.query.limit){
-    query = query.limit(+req.query.limit)
-  }
-
-  const entities = await query.toArray();
-
-  const chats : Chat[] = entities.map(e => ({
+  const chats: Chat[] = entities.map(e => ({
+    _id: e._id.toString(),
     date: e.date,
-    isArchived: e.isArchived,
     title: e.title,
     userEmail: e.userEmail,
-    _id: e._id.toString()
+    isArchived: e.isArchived,
+    searchMessagesResult: e.searchMessagesResult || []
   }));
 
-  res.send(chats)
+  res.send(chats);
+});
 
-})
+
 
 
 
