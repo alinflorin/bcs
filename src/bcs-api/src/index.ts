@@ -57,7 +57,7 @@ app.get("/api/chat/:id", async (req, res)=>{
     return
   }
 
-  const entity = await mongoDbDatabase.collection<ChatEntity>("chats").findOne({_id: id, isArchived: false, userEmail: req.auth!["https://bcs-api/email"]!})
+  const entity = await mongoDbDatabase.collection<ChatEntity>("chats").findOne({_id: id, userEmail: req.auth!["https://bcs-api/email"]!})
 
   if (!entity) {
     res.status(404).send({message: 'Not found'});
@@ -86,11 +86,15 @@ app.get('/api/chats', async (req, res) => {
 
   const searchStr = search?.toString();
 
+  const getArchived = req.query.isArchived ? (
+    req.query.isArchived === 'true'
+  ) : false;
+
   const pipeline: any[] = [
     {
       $match: {
         userEmail,
-        isArchived: false
+        isArchived: getArchived
       }
     },
     // Convert _id -> string for lookup

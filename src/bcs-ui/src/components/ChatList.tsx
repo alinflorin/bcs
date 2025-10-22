@@ -92,7 +92,7 @@ export default function ChatList() {
   async (id: string) => {
        try {
         await axios.patch("/api/update/" + id, {isArchived: true});
-        setChat((prev) => prev.map((c) => c._id === id ? { ...c, isArchived: true } : c));
+        setChat((prev) => prev.filter(x => x._id !== id));
 
         // Close menu if deleted chat had menu open
         if (menuChatId === id) {
