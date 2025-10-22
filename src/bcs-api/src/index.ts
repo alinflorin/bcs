@@ -268,6 +268,55 @@ res.send(aiMessage)
 
 
 
+app.delete('/api/delete/:chatId', async (req, res) => {
+  try {
+    const chatId = req.params.chatId;
+
+    // Validate ObjectId
+    if (!ObjectId.isValid(chatId)) {
+     res.status(400).send({ message: 'Invalid chat ID' });
+     return;
+    }
+
+    const userEmail = req.auth?.["https://bcs-api/email"];
+    if (!userEmail) {
+      res.status(401).send({ message: 'Unauthorized' });
+      return;
+    }
+
+    const chatsCollection = mongoDbDatabase.collection('chats');
+    const messagesCollection = mongoDbDatabase.collection('messages');
+
+    // Check if the chat exists and belongs to this user
+    const chat = await chatsCollection.findOne({ _id: new ObjectId(chatId), userEmail: userEmail });
+
+    if (!chat) {
+       res.status(404).send({ message: 'Chat not found or access denied' });
+       return;
+    }
+
+    // Delete all messages in this chat
+    const deleteMessagesResult = await messagesCollection.deleteMany({ chatId: new ObjectId(chatId) });
+
+    // Delete the chat itself
+    const deleteChatResult = await chatsCollection.deleteOne({ _id: new ObjectId(chatId) });
+
+    res.status(200).send({
+      message: 'Chat and associated messages deleted successfully',
+      deletedChatCount: deleteChatResult.deletedCount,
+      deletedMessageCount: deleteMessagesResult.deletedCount
+    });
+
+  } catch (error) {
+    console.error('Error deleting chat:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+});
+
+
+
+
+
 app.use(notFoundHandler);
 
 app.use(errorHandler);

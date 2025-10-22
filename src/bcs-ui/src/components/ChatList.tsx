@@ -22,10 +22,10 @@ import { useListener } from "react-bus";
 export default function ChatList() {
   const snackbar = useSnackbar();
 
-  const [state, setState] = useState<Chat[]>([]);
+  const [chat, setChat] = useState<Chat[]>([]);
 
   useListener('newChatCreated', (e)=> {
-    setState(prev => [e as Chat, ...prev]);
+    setChat(prev => [e as Chat, ...prev]);
   });
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function ChatList() {
       try {
         const chats = await axios.get("/api/chats");
         console.log(chats.data);
-        setState(chats.data);
+        setChat(chats.data);
       } catch (e: any) {
         snackbar.enqueueSnackbar(e.response?.data?.message || "Error", {
           variant: "error",
@@ -44,6 +44,24 @@ export default function ChatList() {
 
 
   const deleteChat = useCallback(async (id: string) => {
+
+   try{
+
+    const result =  await axios.delete('/api/delete/' + id)
+    console.log(result.data)
+
+    setChat(prev => prev.filter(chat => chat._id?.toString() !== id ))
+
+   }catch(e: any ){
+     snackbar.enqueueSnackbar(e.response?.data?.message || "Error", {
+          variant: "error",
+        });
+
+   }
+
+
+
+    
     
   }, []);
 
@@ -54,7 +72,7 @@ export default function ChatList() {
       </AccordionSummary>
       <AccordionDetails>
         <List>
-          {state.map((c) => (
+          {chat.map((c) => (
             <ListItem key={c._id!}>
               <ListItemButton component={Link} to={"/chat/" + c._id!}>
                 <Box
