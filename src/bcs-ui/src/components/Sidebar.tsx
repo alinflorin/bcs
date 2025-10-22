@@ -9,10 +9,6 @@ import {
   Divider,
   IconButton,
   useMediaQuery,
-  Accordion,
-  AccordionSummary,
-  Typography,
-  AccordionDetails,
   Avatar,
   Menu,
   MenuItem,
@@ -28,12 +24,13 @@ import {
   Home,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { Link, useNavigate } from "react-router";
 import { deepOrange } from "@mui/material/colors";
 import type { User } from "oidc-client-ts";
 import React, { useState } from "react";
 import { version } from "../version";
+import ChatList from "./ChatList";
 
 const drawerWidth = 240;
 
@@ -79,7 +76,7 @@ export default function Sidebar({
         overflowX: "hidden",
       }}
     >
-      <Box sx={{ flex: "auto", minHeight: 0 }}>
+      <Box sx={{ flex: "auto", minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <Box
           sx={{
             display: "flex",
@@ -112,30 +109,19 @@ export default function Sidebar({
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="">
+            <ListItemButton component={Link} to="/search">
               <ListItemIcon>
                 <Search />
               </ListItemIcon>
-              {open && <ListItemText primary="Search" />}
+              {open && <ListItemText primary="Search Chat" />}
             </ListItemButton>
           </ListItem>
         </List>
 
         {user && open && (
-          <Accordion defaultExpanded>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography component="span">Chats</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <List>
-                <ListItem>
-                  <ListItemButton component={Link} to={"/chat/1"}>
-                    <ListItemText primary="Chat 1" />
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            </AccordionDetails>
-          </Accordion>
+          <Box sx={{flex: 'auto', minHeight: 0, overflow: 'auto'}}>
+             <ChatList />
+          </Box>
         )}
       </Box>
 
@@ -189,6 +175,17 @@ export default function Sidebar({
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
+            {user && (
+            <MenuItem   onClick={() => {
+                handleClose();
+                router("/admin");
+              }}>
+              <ListItemIcon>
+                <AdminPanelSettingsIcon fontSize="small" />
+              </ListItemIcon>
+              Admin
+            </MenuItem>
+          )}
           {user && (
             <MenuItem
               onClick={() => {
@@ -202,6 +199,7 @@ export default function Sidebar({
               Settings
             </MenuItem>
           )}
+          
           {user && (
             <MenuItem onClick={onLogout}>
               <ListItemIcon>

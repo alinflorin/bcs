@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 
-export interface MessagesEntity {
+export interface MessageEntity {
   _id?: ObjectId,
   chatId: string,
   date: number,

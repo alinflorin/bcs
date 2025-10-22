@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, IconButton } from "@mui/material";
+import { Box, CircularProgress, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "./components/Sidebar";
 import { Outlet, useLocation, useNavigate } from "react-router";
@@ -75,7 +75,7 @@ export default function App() {
           }}
         >
           {auth.error && <div>Oops... {auth.error.message}</div>}
-          {auth.isLoading && <div>Logging in...</div>}
+          {auth.isLoading && <Box sx={{ display: 'flex' }}><CircularProgress /> </Box>}
           {!auth.error && !auth.isLoading && <Outlet />}
         </Box>
       </Box>
