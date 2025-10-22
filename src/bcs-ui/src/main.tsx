@@ -17,6 +17,7 @@ import NewChat from "./routes/NewChat.tsx";
 import Search from "./routes/Search.tsx";
 import { Provider as BusProvider } from "react-bus";
 import Admin from "./routes/Admin.tsx";
+import { ConfirmProvider } from "./hooks/useConfirmDialog.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <BusProvider>
@@ -24,54 +25,56 @@ createRoot(document.getElementById("root")!).render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthProvider {...oidcConfig}>
-          <BrowserRouter>
-            <Routes>
-              <Route element={<App />}>
-                <Route index element={<Home />} />
-                <Route path="oauth-callback" element={<OauthCallback />} />
-                <Route
-                  path="settings"
-                  element={
-                    <Private>
-                      <Settings />
-                    </Private>
-                  }
-                />
-                <Route
-                  path="new-chat"
-                  element={
-                    <Private>
-                      <NewChat />
-                    </Private>
-                  }
-                />
-                <Route
-                  path="chat/:id"
-                  element={
-                    <Private>
-                      <ViewChat />
-                    </Private>
-                  }
-                />
-                <Route
-                  path="search"
-                  element={
-                    <Private>
-                      <Search />
-                    </Private>
-                  }
-                />
-                <Route
-                  path="admin"
-                  element={
-                    <Private>
-                      <Admin />
-                    </Private>
-                  }
-                />
-              </Route>
-            </Routes>
-          </BrowserRouter>
+          <ConfirmProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route element={<App />}>
+                  <Route index element={<Home />} />
+                  <Route path="oauth-callback" element={<OauthCallback />} />
+                  <Route
+                    path="settings"
+                    element={
+                      <Private>
+                        <Settings />
+                      </Private>
+                    }
+                  />
+                  <Route
+                    path="new-chat"
+                    element={
+                      <Private>
+                        <NewChat />
+                      </Private>
+                    }
+                  />
+                  <Route
+                    path="chat/:id"
+                    element={
+                      <Private>
+                        <ViewChat />
+                      </Private>
+                    }
+                  />
+                  <Route
+                    path="search"
+                    element={
+                      <Private>
+                        <Search />
+                      </Private>
+                    }
+                  />
+                  <Route
+                    path="admin"
+                    element={
+                      <Private>
+                        <Admin />
+                      </Private>
+                    }
+                  />
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </ConfirmProvider>
         </AuthProvider>
       </ThemeProvider>
     </NotificationsProvider>

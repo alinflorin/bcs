@@ -11,12 +11,6 @@ import {
   Menu,
   MenuItem,
   Typography,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
 } from "@mui/material";
 import { Link } from "react-router";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -30,6 +24,7 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder"; //emty
 import BookmarkIcon from "@mui/icons-material/Bookmark"; // filled
 import { useListener } from "react-bus";
 import { Delete, Folder, Share } from "@mui/icons-material";
+import { useConfirm } from "../hooks/useConfirmDialog";
 
 export default function ChatList() {
   const snackbar = useSnackbar();
@@ -38,10 +33,6 @@ export default function ChatList() {
   // Menu state
   const [anchorEl1, setAnchorEl1] = useState<null | HTMLElement>(null);
   const [menuChatId, setMenuChatId] = useState<string | null>(null);
-
-  // Delete dialog state
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
 
   useListener("newChatCreated", (e) => {
     setChat((prev) => [e as Chat, ...prev]);
@@ -108,8 +99,9 @@ export default function ChatList() {
   [snackbar, menuChatId] 
 );
 
+const confirm = useConfirm();
+
   return (
-    <>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography component="span">Chats</Typography>
@@ -191,10 +183,15 @@ export default function ChatList() {
 
                   {/* Delete opens confirmation dialog */}
                   <MenuItem
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.stopPropagation();
-                      setChatToDelete(c._id!);
-                      setDeleteDialogOpen(true);
+                      const ok = await confirm({
+                        title: "Delete this item?",
+                        message: "This action cannot be undone. This chat will be deleted permanently.",
+                      });
+                      if (ok) {
+                        await deleteChat(c._id!);
+                      }
                       handleClose1();
                     }}
                   >
@@ -209,31 +206,6 @@ export default function ChatList() {
           </List>
         </AccordionDetails>
       </Accordion>
-
-      {/* Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this chat? This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button
-            color="error"
-            onClick={async () => {
-              if (chatToDelete) {
-                await deleteChat(chatToDelete);
-                setDeleteDialogOpen(false);
-                setChatToDelete(null);
-              }
-            }}
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    
   );
 }
