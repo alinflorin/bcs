@@ -134,9 +134,9 @@ export default function ViewChat() {
               gap: 2,
             }}
           >
-            {messages.map((m) => (
+            {messages.map((m, i) => (
               <Box
-                key={m._id}
+                key={i.toString()}
                 sx={{
                   display: "flex",
                   justifyContent: m.isFromAi ? "flex-start" : "flex-end",
