@@ -37,7 +37,7 @@ export default function Search() {
         });
       }
     })();
-  }, []);
+  }, [chats]);
 
   const executeSearch = useCallback(async () => {
     if (search.trim() === "") {

@@ -16,6 +16,7 @@ import NotificationsProvider from "./providers/notifications-provider.tsx";
 import NewChat from "./routes/NewChat.tsx";
 import Search from "./routes/Search.tsx";
 import { Provider as BusProvider } from "react-bus";
+import Admin from "./routes/Admin.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <BusProvider>
@@ -57,6 +58,14 @@ createRoot(document.getElementById("root")!).render(
                   element={
                     <Private>
                       <Search />
+                    </Private>
+                  }
+                />
+                <Route
+                  path="admin"
+                  element={
+                    <Private>
+                      <Admin />
                     </Private>
                   }
                 />

@@ -24,7 +24,7 @@ import {
   Home,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { Link, useNavigate } from "react-router";
 import { deepOrange } from "@mui/material/colors";
 import type { User } from "oidc-client-ts";
@@ -175,6 +175,17 @@ export default function Sidebar({
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
+            {user && (
+            <MenuItem   onClick={() => {
+                handleClose();
+                router("/admin");
+              }}>
+              <ListItemIcon>
+                <AdminPanelSettingsIcon fontSize="small" />
+              </ListItemIcon>
+              Admin
+            </MenuItem>
+          )}
           {user && (
             <MenuItem
               onClick={() => {
@@ -188,6 +199,7 @@ export default function Sidebar({
               Settings
             </MenuItem>
           )}
+          
           {user && (
             <MenuItem onClick={onLogout}>
               <ListItemIcon>

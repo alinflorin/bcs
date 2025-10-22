@@ -12,6 +12,8 @@ import { Filter, ObjectId, SortDirection } from "mongodb";
 import { MessageEntity } from "./entities/message-entity";
 import { Message } from "./models/message";
 import messageValidator from "./validators/message-validator";
+import { title } from "process";
+import { UpdateChat } from "./models/updateChat";
 
 
 
@@ -279,10 +281,7 @@ app.delete('/api/delete/:chatId', async (req, res) => {
     }
 
     const userEmail = req.auth?.["https://bcs-api/email"];
-    if (!userEmail) {
-      res.status(401).send({ message: 'Unauthorized' });
-      return;
-    }
+   
 
     const chatsCollection = mongoDbDatabase.collection('chats');
     const messagesCollection = mongoDbDatabase.collection('messages');
@@ -313,6 +312,53 @@ app.delete('/api/delete/:chatId', async (req, res) => {
   }
 });
 
+
+app.patch('/api/edit/:chatId', async (req, res) => {
+  try {
+    const chatId = req.params.chatId;
+    const { title, isArchived } = req.body;
+
+    if (!ObjectId.isValid(chatId)) {
+      return res.status(400).send({ message: 'Invalid chat ID' });
+    }
+
+    // Ensure exactly one field is provided
+    if ((title !== undefined && isArchived !== undefined) || (title === undefined && isArchived === undefined)) {
+      return res.status(400).send({ message: 'Provide exactly one of title or isArchived' });
+    }
+
+    if (isArchived !== undefined && typeof isArchived !== 'boolean') {
+      return res.status(400).send({ message: 'isArchived must be a boolean' });
+    }
+
+    const userEmail = req.auth?.["https://bcs-api/email"];
+    const updateChat = mongoDbDatabase.collection<ChatEntity>('chats');
+
+    const chat = await updateChat.findOne({ _id: new ObjectId(chatId), userEmail });
+    if (!chat) {
+      return res.status(404).send({ message: 'Chat not found or access denied' });
+    }
+
+    const updateFields: UpdateChat = {};
+    if (title !== undefined) updateFields.title = title;
+    if (isArchived !== undefined) updateFields.isArchived = isArchived;
+
+    const result = await updateChat.updateOne(
+      { _id: new ObjectId(chatId) },
+      { $set: updateFields }
+    );
+
+    if (result.modifiedCount === 1) {
+      res.send({ message: 'Chat updated successfully' });
+    } else {
+      res.status(500).send({ message: 'Failed to update chat' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Server error' });
+  }
+});
 
 
 
