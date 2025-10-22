@@ -20,11 +20,16 @@ import { useSnackbar } from "notistack";
 import axios from "axios";
 import { Link } from "react-router";
 import { snippetAroundWord } from "../helpers/string-helpers";
+import { useListener } from "react-bus";
 
 export default function Search() {
   const snackbar = useSnackbar();
   const [chats, setChats] = useState<Chat[]>([]);
   const [search, setSearch] = useState<string>("");
+
+  useListener("chatDeleted", (id) => {
+    setChats((prev) => prev.filter((chat) => chat._id?.toString() !== id));
+  });
 
   useEffect(() => {
     (async () => {
@@ -37,7 +42,7 @@ export default function Search() {
         });
       }
     })();
-  }, [chats]);
+  }, []);
 
   const executeSearch = useCallback(async () => {
     if (search.trim() === "") {

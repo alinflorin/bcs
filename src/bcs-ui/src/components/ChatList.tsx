@@ -22,7 +22,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder"; //emty
 import BookmarkIcon from "@mui/icons-material/Bookmark"; // filled
-import { useListener } from "react-bus";
+import { useBus, useListener } from "react-bus";
 import { Delete, Folder, Share } from "@mui/icons-material";
 import { useConfirm } from "../hooks/useConfirmDialog";
 
@@ -49,12 +49,14 @@ export default function ChatList() {
     })();
   }, [snackbar]);
 
+  const bus = useBus();
+
   const deleteChat = useCallback(
     async (id: string) => {
       try {
         await axios.delete("/api/delete/" + id);
         setChat((prev) => prev.filter((chat) => chat._id?.toString() !== id));
-
+        bus.emit("chatDeleted", id);
         // Close menu if deleted chat had menu open
         if (menuChatId === id) {
           setAnchorEl1(null);
