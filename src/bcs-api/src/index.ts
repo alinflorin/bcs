@@ -313,7 +313,7 @@ app.delete('/api/delete/:chatId', async (req, res) => {
 });
 
 
-app.patch('/api/edit/:chatId', async (req, res) => {
+app.patch('/api/update/:chatId', async (req, res) => {
   try {
     const chatId = req.params.chatId;
     const { title, isArchived } = req.body;

@@ -26,7 +26,8 @@ import { useSnackbar } from "notistack";
 import { Chat } from "../models/chat";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder"; //emty
+import BookmarkIcon from "@mui/icons-material/Bookmark"; // filled
 import { useListener } from "react-bus";
 import { Delete, Folder, Share } from "@mui/icons-material";
 
@@ -84,6 +85,28 @@ export default function ChatList() {
     setAnchorEl1(null);
     setMenuChatId(null);
   };
+
+
+
+  const updateisArchived = useCallback(
+  async (id: string) => {
+       try {
+        await axios.patch("/api/update/" + id, {isArchived: true});
+        setChat((prev) => prev.map((c) => c._id === id ? { ...c, isArchived: true } : c));
+
+        // Close menu if deleted chat had menu open
+        if (menuChatId === id) {
+          setAnchorEl1(null);
+          setMenuChatId(null);
+        }
+      } catch (e: any) {
+        snackbar.enqueueSnackbar(e.response?.data?.message || "Error", { variant: "error" });
+      }
+    
+
+  },
+  [snackbar, menuChatId] 
+);
 
   return (
     <>
@@ -150,9 +173,12 @@ export default function ChatList() {
                     </ListItemIcon>
                     Rename
                   </MenuItem>
-                  <MenuItem>
+                  <MenuItem onClick={async (e)=>{
+                    e.stopPropagation();
+                     await updateisArchived(c._id!)
+                  }} >
                     <ListItemIcon>
-                      <BookmarkBorderIcon fontSize="small" />
+                      {c.isArchived ? (<BookmarkIcon fontSize="small" />): (<BookmarkBorderIcon fontSize="small" />)}
                     </ListItemIcon>
                     Archive
                   </MenuItem>
