@@ -44,22 +44,7 @@ export default function ViewChat() {
 
         setChat(chatResponse.data);
         setMessages(messageResponse.data || []); // fallback to empty array
-        // setMessages([
-        //   {
-        //     chatId: '68f60b33f19b9481eb02ecf6',
-        //     date: 1760971523123,
-        //     isFromAi: true,
-        //     text: 'From agent',
-        //     _id: '68f60b33f19b9481eb02ecee'
-        //   },
-        //   {
-        //     chatId: '68f60b33f19b9481eb02ecf6',
-        //     date: 1760971523124,
-        //     isFromAi: false,
-        //     text: 'From human',
-        //     _id: '68f60b33f19b9481eb02eced'
-        //   }
-        // ]);
+        
       } catch (e: any) {
         console.error(e);
         snackbar.enqueueSnackbar(e.response?.data?.message || "Error", {

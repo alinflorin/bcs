@@ -8,11 +8,10 @@ import jwtHandler from "./middleware/jwt-handler";
 import mongoDbDatabase from "./services/mongodb-service";
 import { Chat } from "./models/chat";
 import { ChatEntity } from "./entities/chat-entity";
-import { Filter, ObjectId, SortDirection } from "mongodb";
+import { ObjectId } from "mongodb";
 import { MessageEntity } from "./entities/message-entity";
 import { Message } from "./models/message";
 import messageValidator from "./validators/message-validator";
-import { title } from "process";
 import { UpdateChat } from "./models/updateChat";
 
 
@@ -275,7 +274,7 @@ res.send(aiMessage)
 
 
 app.delete('/api/delete/:chatId', async (req, res) => {
-  try {
+
     const chatId = req.params.chatId;
 
     // Validate ObjectId
@@ -299,7 +298,7 @@ app.delete('/api/delete/:chatId', async (req, res) => {
     }
 
     // Delete all messages in this chat
-    const deleteMessagesResult = await messagesCollection.deleteMany({ chatId: new ObjectId(chatId) });
+    const deleteMessagesResult = await messagesCollection.deleteMany({ chatId: chatId });
 
     // Delete the chat itself
     const deleteChatResult = await chatsCollection.deleteOne({ _id: new ObjectId(chatId) });
@@ -310,15 +309,12 @@ app.delete('/api/delete/:chatId', async (req, res) => {
       deletedMessageCount: deleteMessagesResult.deletedCount
     });
 
-  } catch (error) {
-    console.error('Error deleting chat:', error);
-    res.status(500).send({ message: 'Internal server error' });
-  }
+
 });
 
 
 app.patch('/api/update/:chatId', async (req, res) => {
-  try {
+  
     const chatId = req.params.chatId;
     const { title, isArchived } = req.body;
 
@@ -355,13 +351,10 @@ app.patch('/api/update/:chatId', async (req, res) => {
     if (result.modifiedCount === 1) {
       res.send({ message: 'Chat updated successfully' });
     } else {
-      res.status(500).send({ message: 'Failed to update chat' });
+      res.status(400).send({ message: 'Failed to update chat' });
     }
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: 'Server error' });
-  }
+  
 });
 
 
