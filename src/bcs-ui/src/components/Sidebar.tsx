@@ -8,7 +8,6 @@ import {
   ListItemText,
   Divider,
   IconButton,
-  useMediaQuery,
   Avatar,
   Menu,
   MenuItem,
@@ -23,7 +22,6 @@ import {
   Search,
   Home,
 } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { Link, useNavigate } from "react-router";
 import { deepOrange } from "@mui/material/colors";
@@ -40,6 +38,7 @@ type SlideProps = {
   user?: User | null;
   onLogout: () => Promise<void>;
   onLogin: () => Promise<void>;
+  isMobile: boolean;
 };
 
 export default function Sidebar({
@@ -48,9 +47,10 @@ export default function Sidebar({
   user,
   onLogin,
   onLogout,
+  isMobile
 }: SlideProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
