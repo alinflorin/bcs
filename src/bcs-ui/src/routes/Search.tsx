@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
 import SearchIcon from "@mui/icons-material/Search";
+import SearchOffIcon from "@mui/icons-material/SearchOff";
 import { useCallback, useEffect, useState } from "react";
 import { Chat } from "../models/chat";
 import { useSnackbar } from "notistack";
@@ -101,9 +102,7 @@ export default function Search() {
                     variant="contained"
                     startIcon={<SearchIcon />}
                     onClick={executeSearch}
-                  >
-                    {" "}
-                    Search{" "}
+                  > Search
                   </Button>
                 </InputAdornment>
               }
@@ -113,32 +112,53 @@ export default function Search() {
         </Box>
       </Typography>
       <Box sx={{ backgroundColor: "black" }}>
-        <List>
-          {chats.map((c) => (
-            <ListItemButton component={Link} to={"/chat/" + c._id!} key={c._id}>
-              <ListItemAvatar>
-                <Avatar>
-                  <FolderIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={c.title}
-                secondary={
-                  c.searchMessagesResult && c.searchMessagesResult.length > 0
-                    ? bold(
-                        snippetAroundWord(
-                          c.searchMessagesResult[0].text,
-                          search,
-                          50
-                        ),
-                        search
-                      )
-                    : undefined
-                }
-              />
-            </ListItemButton>
-          ))}
-        </List>
+        {chats.length === 0 && search.trim() !== "" ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              py: 4,
+              color: "white",
+            }}
+          >
+            <SearchOffIcon  sx={{ fontSize: 50, mb: 2 }} />
+            <Typography variant="h6">No chats found</Typography>
+          </Box>
+        ) : (
+          <List>
+            {chats.map((c) => (
+              <ListItemButton
+                component={Link}
+                to={"/chat/" + c._id!}
+                key={c._id}
+              >
+                <ListItemAvatar>
+                  <Avatar>
+                    <FolderIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={c.title}
+                  secondary={
+                    c.searchMessagesResult &&
+                    c.searchMessagesResult.length > 0
+                      ? bold(
+                          snippetAroundWord(
+                            c.searchMessagesResult[0].text,
+                            search,
+                            50
+                          ),
+                          search
+                        )
+                      : undefined
+                  }
+                />
+              </ListItemButton>
+            ))}
+          </List>
+        )}
       </Box>
     </div>
   );
