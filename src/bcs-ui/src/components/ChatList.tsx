@@ -11,6 +11,12 @@ import {
   Menu,
   MenuItem,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
 } from "@mui/material";
 import { Link } from "react-router";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -23,7 +29,7 @@ import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutli
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder"; //emty
 import BookmarkIcon from "@mui/icons-material/Bookmark"; // filled
 import { useBus, useListener } from "react-bus";
-import { Delete, Folder, Share } from "@mui/icons-material";
+import { Delete, Share } from "@mui/icons-material";
 import { useConfirm } from "../hooks/useConfirmDialog";
 
 export default function ChatList() {
@@ -33,6 +39,17 @@ export default function ChatList() {
   // Menu state
   const [anchorEl1, setAnchorEl1] = useState<null | HTMLElement>(null);
   const [menuChatId, setMenuChatId] = useState<string | null>(null);
+
+   const bus = useBus();
+   const confirm = useConfirm();
+
+  // === RENAME DIALOG STATE ===
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+  const [renameInput, setRenameInput] = useState('');
+  const [chatIdToRename, setChatIdToRename] = useState<string | null>(null);
+
+
+  
 
   useListener("newChatCreated", (e) => {
     setChat((prev) => [e as Chat, ...prev]);
@@ -49,7 +66,7 @@ export default function ChatList() {
     })();
   }, [snackbar]);
 
-  const bus = useBus();
+
 
   const deleteChat = useCallback(
     async (id: string) => {
@@ -79,6 +96,21 @@ export default function ChatList() {
     setMenuChatId(null);
   };
 
+  // Function to open the dialog, called from the menu item
+  const handleOpenRenameDialog = (chatId: string, currentTitle: string) => {
+    handleClose1(); // Always close the context menu
+    setChatIdToRename(chatId);
+    setRenameInput(currentTitle);
+    setIsRenameDialogOpen(true);
+  };
+
+  // Function to close the dialog and reset the state
+  const handleCloseRenameDialog = () => {
+    setIsRenameDialogOpen(false);
+    setChatIdToRename(null);
+    setRenameInput('');
+  };
+
 
 
   const updateisArchived = useCallback(
@@ -101,9 +133,35 @@ export default function ChatList() {
   [snackbar, menuChatId] 
 );
 
-const confirm = useConfirm();
+const updateTitle = useCallback(
+    async () => {
+      const newTitle = renameInput.trim();
+      if (!chatIdToRename || !newTitle) {
+        handleCloseRenameDialog();
+        return;
+      }
 
-  return (
+      try {
+        await axios.patch("/api/update/" + chatIdToRename, { title: newTitle });
+
+        // Update the chat title in the local state
+        setChat((prev) =>
+          prev.map((c) =>
+            c._id === chatIdToRename ? { ...c, title: newTitle } : c
+          )
+        );
+
+        handleCloseRenameDialog();
+        snackbar.enqueueSnackbar("Chat renamed successfully", { variant: "success" });
+
+      } catch (e: any) {
+        snackbar.enqueueSnackbar(e.response?.data?.message || "Error renaming chat", { variant: "error" });
+      }
+    },
+    [snackbar, chatIdToRename, renameInput]
+  );
+
+  return ( <>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography component="span">Chats</Typography>
@@ -117,7 +175,7 @@ const confirm = useConfirm();
               >
                 {/* Navigation */}
                 <ListItemButton component={Link} to={"/chat/" + c._id!} sx={{ flex: 1 }}>
-                  <ListItemText primary={c.title} />
+                  <ListItemText primary={c.title.length > 11 ? c.title.slice(0,11)+ "..." : c.title} />
                 </ListItemButton>
 
                 {/* Menu Button */}
@@ -161,7 +219,7 @@ const confirm = useConfirm();
                     </ListItemIcon>
                     Share
                   </MenuItem>
-                  <MenuItem>
+                  <MenuItem onClick={() => handleOpenRenameDialog(c._id!, c.title)}>
                     <ListItemIcon>
                       <DriveFileRenameOutlineIcon fontSize="small" />
                     </ListItemIcon>
@@ -176,13 +234,6 @@ const confirm = useConfirm();
                     </ListItemIcon>
                     Archive
                   </MenuItem>
-                  <MenuItem>
-                    <ListItemIcon>
-                      <Folder fontSize="small" />
-                    </ListItemIcon>
-                    Move to project
-                  </MenuItem>
-
                   {/* Delete opens confirmation dialog */}
                   <MenuItem
                     onClick={async (e) => {
@@ -208,6 +259,41 @@ const confirm = useConfirm();
           </List>
         </AccordionDetails>
       </Accordion>
-    
+
+      
+      <Dialog
+        open={isRenameDialogOpen}
+        onClose={handleCloseRenameDialog}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>Rename Chat</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="new-chat-title-input"
+            label="New Chat Title"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={renameInput}
+            onChange={(e) => setRenameInput(e.target.value)}
+            // Allows 'Enter' key to trigger the rename action
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' && renameInput.trim()) {
+                    updateTitle();
+                }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRenameDialog}>Cancel</Button>
+          <Button onClick={updateTitle} disabled={!renameInput.trim()}>
+            Rename
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
