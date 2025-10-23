@@ -85,7 +85,7 @@ export default function Search() {
             alignItems: "center",
           }}
         >
-          <FormControl sx={{ width: "60%", maxWidth: 600 }}>
+          <FormControl sx={{ width: "100%", maxWidth: 800 }}>
             <InputLabel>Search Chat</InputLabel>
             <OutlinedInput
               value={search}

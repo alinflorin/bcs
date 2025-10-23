@@ -198,7 +198,7 @@ export default function ViewChat() {
             What are you working on?
           </Typography>
 
-          <FormControl sx={{ width: "60%", maxWidth: 600 }}>
+          <FormControl sx={{ width: "100%", maxWidth: 800 }}>
             <InputLabel>Ask anything</InputLabel>
            <OutlinedInput
   value={inputText}
