@@ -37,7 +37,6 @@ export default function Search() {
 });
 
   
-
   useEffect(() => {
     (async () => {
       try {
