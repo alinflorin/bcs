@@ -49,6 +49,7 @@ export default function ChatList() {
   const [chatIdToRename, setChatIdToRename] = useState<string | null>(null);
 
 
+
   
 
   useListener("newChatCreated", (e) => {
@@ -161,6 +162,52 @@ const updateTitle = useCallback(
     [snackbar, chatIdToRename, renameInput]
   );
 
+
+
+    const shareChat = useCallback(
+       async (c:  Chat) => {
+       try {
+          // 1. Ask backend to generate/get publicId
+        const resposne = await axios.post<Chat>(`/api/share/${c._id}`)
+        const publicId = resposne.data.publicId
+
+      //Build the frontend share url
+      const shareUrl = `${window.location.origin}/public/${publicId}`;
+
+     
+      // 3. Detect if Web Share API is available
+      if (navigator.share) {
+        // Mobile / supported browsers
+        await navigator.share({
+          title: c.title,
+          text: "Check out this chat!",
+          url: shareUrl,
+        });
+      } else {
+        // Desktop fallback: copy to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        snackbar.enqueueSnackbar("Share link copied to clipboard", {
+          variant: "success",
+        });
+      }
+
+        // Close menu if deleted chat had menu open
+        if (menuChatId === c._id) {
+          setAnchorEl1(null);
+          setMenuChatId(null);
+        }
+      } catch (e: any) {
+        snackbar.enqueueSnackbar(e.response?.data?.message || "Error", { variant: "error" });
+      }
+    
+
+  },
+  [snackbar, menuChatId] 
+);
+
+
+
+
   return ( <>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -213,7 +260,10 @@ const updateTitle = useCallback(
                   transformOrigin={{ horizontal: "right", vertical: "top" }}
                   anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                 >
-                  <MenuItem>
+                  <MenuItem onClick={async (l)=>{
+                    l.stopPropagation()
+                     await shareChat(c)
+                  }} >
                     <ListItemIcon>
                       <Share fontSize="small" />
                     </ListItemIcon>
@@ -260,7 +310,7 @@ const updateTitle = useCallback(
         </AccordionDetails>
       </Accordion>
 
-      
+          {/* Rename Dialog */}
       <Dialog
         open={isRenameDialogOpen}
         onClose={handleCloseRenameDialog}
@@ -294,6 +344,7 @@ const updateTitle = useCallback(
           </Button>
         </DialogActions>
       </Dialog>
+
     </>
   );
 }

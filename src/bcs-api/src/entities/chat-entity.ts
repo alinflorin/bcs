@@ -5,5 +5,7 @@ export interface ChatEntity {
     date: number,
     title: string,
     userEmail: string,
-    isArchived: boolean
+    isArchived: boolean,
+    isPublic?: boolean,
+    publicId?: string
 }
