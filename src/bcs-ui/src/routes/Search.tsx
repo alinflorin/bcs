@@ -154,22 +154,32 @@ export default function Search() {
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                  primary={c.title}
-                  primaryTypographyProps={{
-                    noWrap: true,
-                    sx: { color: "white", fontWeight: 500 },
-                  }}
+                  primary={
+                    <Typography
+                      noWrap
+                      sx={{ color: "white", fontWeight: 500 }}
+                    >
+                      {c.title}
+                    </Typography>
+                  }
                   secondary={
-                    c.searchMessagesResult && c.searchMessagesResult.length > 0
-                      ? bold(
+                    c.searchMessagesResult && c.searchMessagesResult.length > 0 ? (
+                      <Typography
+                        sx={{
+                          color: "#b0b0b0",
+                          fontSize: "0.875rem",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {bold(
                           snippetAroundWord(c.searchMessagesResult[0].text, search, 50),
                           search
-                        )
-                      : undefined
+                        )}
+                      </Typography>
+                    ) : null
                   }
-                  secondaryTypographyProps={{
-                    sx: { color: "#b0b0b0", fontSize: "0.875rem", overflow: "hidden", textOverflow: "ellipsis" },
-                  }}
                 />
               </ListItemButton>
             </Paper>
