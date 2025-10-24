@@ -7,4 +7,6 @@ export interface Chat {
     userEmail: string,
     isArchived: boolean,
     searchMessagesResult?: Message[]
+    isPublic?: boolean;     
+    publicId?: string; 
 }

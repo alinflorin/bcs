@@ -13,6 +13,7 @@ import { MessageEntity } from "./entities/message-entity";
 import { Message } from "./models/message";
 import messageValidator from "./validators/message-validator";
 import { UpdateChat } from "./models/updateChat";
+import { randomBytes } from 'crypto'
 
 
 
@@ -24,7 +25,65 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "OK", version: version });
 });
 
+
+
+// public endpoint
+app.get('/api/public/:publicId', async (req, res)=>{
+
+  const publicId = req.params.publicId
+
+  const chat = await mongoDbDatabase.collection<ChatEntity>('chats').findOne({publicId, isPublic: true})
+
+  if(!chat){
+       res.status(404).send({message: 'Chat not public'})
+    return
+  }
+
+  const entities = await mongoDbDatabase.collection<MessageEntity>('messages').find({chatId: chat._id.toString()}).sort({date: 1}).toArray()
+
+  const messages: Message[] = entities.map(m => ({
+    chatId: m.chatId,
+    date: m.date,
+    isFromAi: m.isFromAi,
+    text: m.text,
+    _id: m._id.toString(),
+  }))
+
+  res.send({chatTitle: chat.title, messages})
+
+
+})
+
 app.use(jwtHandler);
+
+// creare link ...
+app.post('/api/share/:chatId', async (req, res)=>{
+
+  const chatId = req.params.chatId
+  const userEmail = req.auth!["https://bcs-api/email"]
+
+  if (!ObjectId.isValid(chatId)) {
+        res.status(400).send({message: 'Invalid ID'})
+    return
+  }
+
+  const chat = await mongoDbDatabase.collection<ChatEntity>('chats').findOne({_id: new ObjectId(chatId), userEmail: userEmail})
+
+  //autorizare
+
+  if( !chat ){
+    res.status(403).send({message: 'NO access'})
+    return
+  }
+
+    // Generate a random publicId if not already shared
+  const publicId = chat.publicId || randomBytes(16).toString('hex')
+
+  await mongoDbDatabase.collection<ChatEntity>('chats').updateOne({_id: chat._id}, {$set: {isPublic: true, publicId: publicId}})
+
+  res.send({publicId: publicId})
+
+})
 
 
 app.post("/api/chat/new", async (req, res) => {
@@ -34,6 +93,9 @@ app.post("/api/chat/new", async (req, res) => {
     date: new Date().getTime(),
     title: "New Chat",
     userEmail: req.auth!["https://bcs-api/email"],
+    ///add here 
+    isPublic: false,
+    publicId: undefined
   };
 
   await mongoDbDatabase.collection<ChatEntity>("chats").insertOne(chat);
@@ -42,7 +104,11 @@ app.post("/api/chat/new", async (req, res) => {
     isArchived: chat.isArchived,
     title: chat.title,
     userEmail:chat.userEmail,
-    _id: chat._id?.toString()
+    _id: chat._id?.toString(),
+
+    ///here too 
+    isPublic: chat.isPublic,
+    publicId: chat.publicId
   } as Chat);
 });
 
@@ -177,11 +243,6 @@ app.get('/api/chats', async (req, res) => {
 
   res.send(chats);
 });
-
-
-
-
-
 
 
 
