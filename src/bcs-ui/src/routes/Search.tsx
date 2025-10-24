@@ -32,6 +32,12 @@ export default function Search() {
     setChats((prev) => prev.filter((chat) => chat._id?.toString() !== id));
   });
 
+  useListener("chatArchived", (id) => {
+  setChats((prev) => prev.filter((chat) => chat._id?.toString() !== id));
+});
+
+  
+
   useEffect(() => {
     (async () => {
       try {

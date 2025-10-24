@@ -48,10 +48,6 @@ export default function ChatList() {
   const [renameInput, setRenameInput] = useState('');
   const [chatIdToRename, setChatIdToRename] = useState<string | null>(null);
 
-
-
-  
-
   useListener("newChatCreated", (e) => {
     setChat((prev) => [e as Chat, ...prev]);
   });
@@ -119,6 +115,7 @@ export default function ChatList() {
        try {
         await axios.patch("/api/update/" + id, {isArchived: true});
         setChat((prev) => prev.filter(x => x._id !== id));
+        bus.emit("chatArchived", id);
 
         // Close menu if deleted chat had menu open
         if (menuChatId === id) {
