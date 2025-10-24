@@ -37,7 +37,7 @@ createRoot(document.getElementById("root")!).render(
                   <Route path="new-chat" element={ <Private> <NewChat/> </Private>}/>
                   <Route path="chat/:id" element={ <Private><ViewChat/> </Private>}/>
                   <Route path="search" element={ <Private> <Search/> </Private>}/>
-                  <Route path="admin" element={ <Private><Admin/> </Private>}/>
+                  <Route path="admin" element={ <Private adminOnly={true}><Admin/> </Private>}/>
                 </Route>
               </Routes>
             </BrowserRouter>

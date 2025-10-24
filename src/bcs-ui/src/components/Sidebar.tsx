@@ -141,7 +141,6 @@ export default function Sidebar({
         <Menu
           anchorEl={anchorEl}
           open={menuOpen}
-          aria-hidden="false"
           onClose={handleClose}
           onClick={handleClose}
           slotProps={{
@@ -175,8 +174,8 @@ export default function Sidebar({
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-            {user && (
-            <MenuItem   onClick={() => {
+            {user && user.profile["https://bcs-api/roles"]?.includes("admin") && (
+            <MenuItem onClick={() => {
                 handleClose();
                 router("/admin");
               }}>
