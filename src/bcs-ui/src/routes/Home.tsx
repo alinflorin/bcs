@@ -3,7 +3,6 @@ import {
   Typography,
   Button,
   Card,
-  CardContent,
   Avatar,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
