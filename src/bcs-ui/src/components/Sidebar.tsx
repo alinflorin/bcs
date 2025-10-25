@@ -174,7 +174,7 @@ export default function Sidebar({
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-            {user && user.profile["https://bcs-api/roles"]?.includes("admin") && (
+            {user && user.profile["https://bcs-api/roles"]?.map(x => x.toLowerCase())?.includes("bcs-api-admin") && (
             <MenuItem onClick={() => {
                 handleClose();
                 router("/admin");

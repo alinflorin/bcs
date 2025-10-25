@@ -6,7 +6,7 @@ export default function isAdmin(
   res: Response,
   next: NextFunction
 ) {
-  if (req.auth?.["https://bcs-api/roles"]?.includes("admin")) {
+  if (req.auth?.["https://bcs-api/roles"]?.map(x => x.toLowerCase())?.includes("bcs-api-admin")) {
     return next();
   }
   return res.status(403).json({

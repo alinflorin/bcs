@@ -17,7 +17,7 @@ export default function Private(props: PropsWithChildren<PrivateProps>) {
   if (
     !auth.isAuthenticated ||
     (props.adminOnly &&
-      !auth.user?.profile?.["https://bcs-api/roles"]?.includes("admin"))
+      !auth.user?.profile?.["https://bcs-api/roles"]?.map(x => x.toLowerCase())?.includes("bcs-api-admin"))
   ) {
     sessionStorage.setItem("postLoginRedirect", location.pathname);
     auth.signinRedirect();
