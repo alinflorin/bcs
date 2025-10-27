@@ -36,7 +36,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import axios from "axios";
 import { useSnackbar } from "notistack";
 import { Chat } from "../models/chat";
-import { useBus, useListener } from "react-bus";
+
 import { useConfirm } from "../hooks/useConfirmDialog";
 
 export default function Settings() {
@@ -47,7 +47,6 @@ export default function Settings() {
    const snackbar = useSnackbar();
    const [chat, setChat] = useState<Chat[]>([]);
 
-    const bus = useBus();
       const confirm = useConfirm();
    
 
@@ -299,6 +298,7 @@ case "Data & Control":
                   fullWidth={isMobile}
                    onClick={async (e)=>{
                     e.stopPropagation();
+                    if (!c._id) return;
                      await updateisArchived(c._id!)
                   }} >
                   Unarchive
