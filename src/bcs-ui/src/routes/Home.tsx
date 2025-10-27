@@ -35,7 +35,16 @@ export default function HomeAdvancedDark() {
   ];
 
   return (
-    <Box sx={{ width: "100%", minHeight: "100vh", bgcolor: "#121212", p: 4, color: "white" }}>
+    <Box 
+      sx={{ 
+        width: "100%", 
+        minHeight: "100vh", 
+        bgcolor: "#121212", 
+        // Reduced padding on mobile (xs)
+        p: { xs: 2, sm: 4 }, 
+        color: "white" 
+      }}
+    >
       {/* Hero Section */}
       <Box
         sx={{
@@ -45,16 +54,33 @@ export default function HomeAdvancedDark() {
           mb: 6,
         }}
       >
-        <Typography variant="h2" component="h1" gutterBottom>
+        <Typography 
+          // Set a default variant (e.g., h2)
+          variant="h2" 
+          component="h1" 
+          gutterBottom
+          sx={{ 
+            // Use sx to responsively override the fontSize
+            fontSize: { 
+              xs: '2.25rem', // h4 equivalent size
+              sm: '3rem',    // h3 equivalent size
+              md: '3.75rem', // h2 equivalent size
+            }
+          }}
+        >
           Welcome to MyChat AI
         </Typography>
-        <Typography variant="h6" sx={{ mb: 4, color: "#b0b0b0" }}>
+        <Typography 
+          variant="h6" // Set a default variant
+          sx={{ mb: 4, color: "#b0b0b0", fontSize: { xs: '1rem', sm: '1.25rem' } }} // Adjust size for mobile
+        >
           Smart conversations, easy management, and full control of your chats.
         </Typography>
         <Button
           variant="contained"
           size="large"
-          sx={{ mr: 2, bgcolor: "#90caf9", color: "#121212", "&:hover": { bgcolor: "#64b5f6" } }}
+          // Adjusted button margins for mobile stacking
+          sx={{ mr: { xs: 0, sm: 2 }, mb: { xs: 2, sm: 0 }, bgcolor: "#90caf9", color: "#121212", "&:hover": { bgcolor: "#64b5f6" } }} 
         >
           Start a Chat
         </Button>
@@ -67,12 +93,14 @@ export default function HomeAdvancedDark() {
         </Button>
       </Box>
 
-      {/* Features Section */}
+      {/* --- */}
+      
+      {/* Features Section (No changes needed, already responsive) */}
       <Box
         sx={{
           display: "flex",
           flexWrap: "wrap",
-          gap: 4,
+          gap: { xs: 2, sm: 4 }, 
           justifyContent: "center",
           mb: 6,
         }}
@@ -112,11 +140,13 @@ export default function HomeAdvancedDark() {
         ))}
       </Box>
 
-      {/* Mock Chat Preview */}
+      {/* --- */}
+
+      {/* Mock Chat Preview and CTA (No changes needed, already responsive) */}
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", md: "row" },
+          flexDirection: { xs: "column", md: "row" }, 
           alignItems: "center",
           gap: 4,
           justifyContent: "center",
@@ -125,7 +155,7 @@ export default function HomeAdvancedDark() {
         <Card
           sx={{
             flex: 1,
-            maxWidth: 400,
+            maxWidth: { xs: "100%", sm: 400 }, 
             p: 3,
             borderRadius: 3,
             bgcolor: "#1e1e1e",
@@ -153,6 +183,7 @@ export default function HomeAdvancedDark() {
         <Box
           sx={{
             flex: 1,
+            width: { xs: "100%", md: "auto" },
             textAlign: "center",
             p: 4,
             bgcolor: "#2a2a2a",

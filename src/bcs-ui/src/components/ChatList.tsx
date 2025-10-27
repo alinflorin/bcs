@@ -36,12 +36,12 @@ export default function ChatList() {
   const snackbar = useSnackbar();
   const [chat, setChat] = useState<Chat[]>([]);
 
+     const bus = useBus();
+   const confirm = useConfirm();
+
   // Menu state
   const [anchorEl1, setAnchorEl1] = useState<null | HTMLElement>(null);
   const [menuChatId, setMenuChatId] = useState<string | null>(null);
-
-   const bus = useBus();
-   const confirm = useConfirm();
 
   // === RENAME DIALOG STATE ===
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
@@ -51,6 +51,8 @@ export default function ChatList() {
   useListener("newChatCreated", (e) => {
     setChat((prev) => [e as Chat, ...prev]);
   });
+
+
 
   useEffect(() => {
     (async () => {
@@ -117,7 +119,7 @@ export default function ChatList() {
         setChat((prev) => prev.filter(x => x._id !== id));
         bus.emit("chatArchived", id);
 
-        // Close menu if deleted chat had menu open
+        // Close menu if archive chat had menu open
         if (menuChatId === id) {
           setAnchorEl1(null);
           setMenuChatId(null);

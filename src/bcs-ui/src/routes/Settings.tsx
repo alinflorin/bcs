@@ -17,7 +17,7 @@ import {
   ListItemAvatar,
   ListItemText,
 } from "@mui/material";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 
 // --- Icons ---
@@ -33,11 +33,25 @@ import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import UploadIcon from "@mui/icons-material/Upload";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
+import axios from "axios";
+import { useSnackbar } from "notistack";
+import { Chat } from "../models/chat";
+import { useBus, useListener } from "react-bus";
+import { useConfirm } from "../hooks/useConfirmDialog";
 
 export default function Settings() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [selected, setSelected] = useState("Profile");
+
+   const snackbar = useSnackbar();
+   const [chat, setChat] = useState<Chat[]>([]);
+
+    const bus = useBus();
+      const confirm = useConfirm();
+   
+
+ 
 
   const sections = [
     { label: "Profile", icon: <PersonIcon /> },
@@ -48,11 +62,50 @@ export default function Settings() {
     { label: "Account", icon: <AccountCircleIcon /> },
   ];
 
-  const archivedChats = [
-    { id: "1", title: "Project Alpha Discussion" },
-    { id: "2", title: "Team Meeting Notes" },
-    { id: "3", title: "AI Research Chat" },
-  ];
+
+    useEffect(() => {
+      (async () => {
+        try {
+          const chats = await axios.get("/api/chats?isArchived=true");
+          setChat(chats.data);
+          console.log(chats.data)
+        } catch (e: any) {
+          snackbar.enqueueSnackbar(e.response?.data?.message || "Error", { variant: "error" });
+        }
+      })();
+    }, [snackbar]);
+
+ const deleteChat = useCallback(
+    async (id: string) => {
+      try {
+        await axios.delete("/api/delete/" + id);
+        setChat((prev) => prev.filter((chat) => chat._id?.toString() !== id));
+       
+      
+      } catch (e: any) {
+        snackbar.enqueueSnackbar(e.response?.data?.message || "Error", { variant: "error" });
+      }
+    },
+    [snackbar]
+  );
+
+    const updateisArchived = useCallback(
+  async (id: string) => {
+       try {
+        await axios.patch("/api/update/" + id, {isArchived: false});
+        setChat((prev) => prev.filter(x => x._id !== id));// remove from archived list
+       // bus.emit("chatUnArchived", id); // notify other components
+
+        
+      } catch (e: any) {
+        snackbar.enqueueSnackbar(e.response?.data?.message || "Error", { variant: "error" });
+      }
+    
+
+  },
+  [snackbar ] 
+);
+
 
   // ---------- Content Renderer ----------
   const renderContent = () => {
@@ -178,66 +231,110 @@ export default function Settings() {
           </Stack>
         );
 
-      case "Data & Control":
-        return (
-          <Stack spacing={3}>
-            <Typography variant="h6">Data & Control</Typography>
-            <Typography color="text.secondary">
-              Manage your archived chats and data privacy options.
-            </Typography>
+case "Data & Control":
+  return (
+    <Stack spacing={3}>
+      <Typography variant="h6">Data & Control</Typography>
+      <Typography color="text.secondary">
+        Manage your archived chats and data privacy options.
+      </Typography>
 
-            <Paper
-              variant="outlined"
-              sx={{ p: 2, borderRadius: 2, backgroundColor: "background.paper" }}
+      <Paper
+        variant="outlined"
+        sx={{
+          p: 2,
+          borderRadius: 2,
+          backgroundColor: "background.paper",
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ mb: 2 }}>
+          Archived Chats
+        </Typography>
+
+        <List>
+          {chat.map((c) => (
+            <ListItem
+              key={c._id}
+              sx={{
+                flexDirection: isMobile ? "column" : "row",
+                alignItems: isMobile ? "flex-start" : "center",
+                justifyContent: "space-between",
+                backgroundColor: "action.hover",
+                borderRadius: 2,
+                mb: 1,
+                px: 2,
+                py: isMobile ? 1.5 : 1,
+                gap: isMobile ? 1.5 : 0,
+              }}
             >
-              <Typography variant="subtitle1" sx={{ mb: 2 }}>
-                Archived Chats
-              </Typography>
-              <List>
-                {archivedChats.map((chat) => (
-                  <ListItem
-                    key={chat.id}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      backgroundColor: "action.hover",
-                      borderRadius: 2,
-                      mb: 1,
-                      px: 2,
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  width: "100%",
+                }}
+              >
+                <ListItemAvatar>
+                  <Avatar>
+                    <FolderIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={c.title} />
+              </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
+                  gap: 1,
+                  width: isMobile ? "100%" : "auto",
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  color="success"
+                  size="small"
+                  startIcon={<UnarchiveIcon />}
+                  fullWidth={isMobile}
+                   onClick={async (e)=>{
+                    e.stopPropagation();
+                    if (!c._id) return;
+                     await updateisArchived(c._id!)
+                  }}
+              
+                >
+                  Unarchive
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  startIcon={<DeleteIcon />}
+                  fullWidth={isMobile}
+                   onClick={async (e) => {
+                      e.stopPropagation();
+                      const ok = await confirm({
+                        title: "Delete this item?",
+                        message: "This action cannot be undone. This chat will be deleted permanently.",
+                      });
+                      if (ok) {
+                        await deleteChat(c._id!);
+                      }
+                     
                     }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <ListItemAvatar>
-                        <Avatar>
-                          <FolderIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText primary={chat.title} />
-                    </Box>
-                    <Box sx={{ display: "flex", gap: 1 }}>
-                      <Button
-                        variant="outlined"
-                        color="success"
-                        size="small"
-                        startIcon={<UnarchiveIcon />}
-                      >
-                        Unarchive
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        startIcon={<DeleteIcon />}
-                      >
-                        Delete
-                      </Button>
-                    </Box>
-                  </ListItem>
-                ))}
-              </List>
-            </Paper>
-          </Stack>
-        );
+                >
+                  Delete
+                </Button>
+              </Box>
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
+    </Stack>
+  );
+
+     
 
       case "Account":
         return (
