@@ -299,11 +299,8 @@ case "Data & Control":
                   fullWidth={isMobile}
                    onClick={async (e)=>{
                     e.stopPropagation();
-                    if (!c._id) return;
                      await updateisArchived(c._id!)
-                  }}
-              
-                >
+                  }} >
                   Unarchive
                 </Button>
                 <Button
