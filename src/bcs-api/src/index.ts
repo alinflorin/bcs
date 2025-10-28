@@ -13,13 +13,29 @@ import { MessageEntity } from "./entities/message-entity";
 import { Message } from "./models/message";
 import messageValidator from "./validators/message-validator";
 import { UpdateChat } from "./models/updateChat";
-import { randomBytes } from 'crypto'
+import { randomBytes } from 'crypto';
+import multer from "multer";
+import geminiClient from "./services/geminiClient-service";
+import clientQdrant from "./services/qdrantdb-services";
+import isAdmin from "./middleware/is-admin-middleware";
+
+// DESEREALIZATOR because we recive the from data (bite) and this is transform in req.files 
+const upload = multer({ storage: multer.memoryStorage() });  // middleware 
 
 
 
+
+// ✂️ Split text into overlapping chunks
+function splitText(text: string, chunkSize = 1000, overlap = 200): string[] {
+  const chunks: string[] = [];
+  for (let i = 0; i < text.length; i += chunkSize - overlap) {
+    chunks.push(text.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
 
 const app = express();
-app.use(express.json());
+app.use(express.json());  ///  req.body 
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK", version: version });
@@ -417,6 +433,32 @@ app.patch('/api/update/:chatId', async (req, res) => {
 
   
 });
+
+
+
+// 📤 Upload route
+app.post("api/upload", isAdmin, upload.array("files"),  async (req, res) => {
+
+
+  const name = req.query.name
+ 
+    const files = req.files as Express.Multer.File[];
+    if (!files || files.length === 0) {
+      return res.status(400).json({ message: "No files uploaded" });
+    }
+
+    let allChunks: string[] = [];
+
+    // 1️⃣ Extract text from each PDF
+
+    
+
+    // 2️⃣ Generate embeddings in batches (faster)
+
+    // 3️⃣ Upsert embeddings into Qdrant
+ 
+});
+
 
 
 
