@@ -449,9 +449,7 @@ app.post("api/upload", isAdmin, upload.array("files"),  async (req, res) => {
 
     let allChunks: string[] = [];
 
-    // 1️⃣ Extract text from each PDF
-
-    
+    // 1️⃣ Extract text from each PDF   
 
     // 2️⃣ Generate embeddings in batches (faster)
 
