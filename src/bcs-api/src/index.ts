@@ -22,7 +22,6 @@ import mammoth from "mammoth";
 
 
 
-
 // DESEREALIZATOR because we recive the from data (bite) and this is transform in req.files 
 // Memory storage
 const storage: StorageEngine = multer.memoryStorage();

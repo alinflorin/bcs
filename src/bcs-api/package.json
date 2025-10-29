@@ -7,8 +7,8 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "ncc build src/index.ts -o dist",
-    "start": "tsx watch src/index.ts"
+    "start": "tsx watch src/index.ts",
+    "start:prod": "tsx src/index.ts"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.3",
@@ -16,8 +16,6 @@
     "@types/express-jwt": "^7.4.4",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.9.1",
-    "@types/pdfjs-dist": "^2.10.377",
-    "@vercel/ncc": "^0.38.4",
     "dotenv": "^17.2.3",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
@@ -32,6 +30,7 @@
     "mammoth": "^1.11.0",
     "mongodb": "^6.20.0",
     "multer": "^2.0.2",
+    "pdf-parse": "^2.4.5",
     "yup": "^1.7.1"
   }
 }
