@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const geminiClient = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
+
 // We create the embedding model once (reused for every call)
 const embeddingModel = geminiClient.getGenerativeModel({
   model: "text-embedding-004",

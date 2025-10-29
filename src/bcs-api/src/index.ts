@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 import express from "express";
 import { version } from "./version";
 import errorHandler from "./middleware/error-handler";
@@ -14,17 +13,20 @@ import { Message } from "./models/message";
 import messageValidator from "./validators/message-validator";
 import { UpdateChat } from "./models/updateChat";
 import { randomBytes } from 'crypto';
-import multer from "multer";
+import multer, { StorageEngine } from "multer";
 import { extractTextFromPDF } from "./utils/pdfExtractor";
 import { getEmbedding } from "./services/geminiClient-service";
 import clientQdrant from "./services/qdrantdb-services";
 import isAdmin from "./middleware/is-admin-middleware";
+import mammoth from "mammoth";
 
 
 
 
 // DESEREALIZATOR because we recive the from data (bite) and this is transform in req.files 
-const upload = multer({ storage: multer.memoryStorage() });  // middleware 
+// Memory storage
+const storage: StorageEngine = multer.memoryStorage();
+const upload = multer({ storage });
 
 
 // ✂️ Split text into overlapping chunks
@@ -441,15 +443,24 @@ app.patch('/api/update/:chatId', async (req, res) => {
 
 
 // 📤 Upload route
-app.post("api/upload", isAdmin, upload.array("files"),  async (req, res) => {
+app.post("/api/upload", isAdmin, upload.array("files"),  async (req, res) => {
 
 
   const name = req.query.name as string;
   const files = req.files as Express.Multer.File[];
 
+  console.log("Document name:", name);
+  console.log("Uploaded files:", files.map(f => f.originalname));
+
+
+
     if (!files || files.length === 0) {
       return res.status(400).json({ message: "No files uploaded" });
     }
+
+      if (!process.env.GEMINI_API_KEY) {
+    return res.status(500).json({ message: "GEMINI API key not set" });
+  }
 
     let allChunks: string[] = [];
 
@@ -458,36 +469,60 @@ app.post("api/upload", isAdmin, upload.array("files"),  async (req, res) => {
      for (const file of files) {
       let text = "";
 
-      if (file.mimetype === "application/pdf") {
-        text = await extractTextFromPDF(file.buffer);
-      } else if (file.mimetype.startsWith("text/")) {
-        text = file.buffer.toString("utf8");
-      } else {
-        console.log("Unsupported file type:", file.mimetype);
-        continue;
-      }
-
+    if (file.mimetype === "application/pdf") {
+  text = await extractTextFromPDF(file.buffer);
+} else if (file.mimetype.startsWith("text/")) {
+  text = file.buffer.toString("utf8");
+} else if (file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+  const result = await mammoth.extractRawText({ buffer: file.buffer });
+  text = result.value; // extracted text
+} else {
+  console.log("Unsupported file type:", file.mimetype);
+  continue;
+}
       const chunks = splitText(text);
       allChunks.push(...chunks);
     }
 
+      if (allChunks.length === 0) {
+      return res.status(400).json({ message: "No valid text extracted from files" });
+    }
+
+    console.log("text k ")
+
     // 2️⃣ Generate embeddings in batches (faster)
+
 
     const embeddings: number[][] = [];
   for (const chunk of allChunks) {
     const vector = await getEmbedding(chunk);
     embeddings.push(vector)
   }
-   
+   console.log("gemini ok ")
+
+   // Check if collection exists, create if not
+   await clientQdrant.createCollection(name, {
+  vectors: {
+    size: 768,
+    distance: "Cosine",
+  },
+});
+
+
+ 
+   console.log("colection ok ")
 
     // 3️⃣ Upsert embeddings into Qdrant
      const points = allChunks.map((chunk, idx) => ({
-    id: `${name}-${idx}`, // unique id
-    vector: embeddings[idx] as number[],
+    id: idx, // unique id
+    vector: embeddings[idx]! as number[],
     payload: { text: chunk, source: name },
   }));
 
- await clientQdrant.upsert(name, { points });
+ await clientQdrant.upsert(name, { points, wait: true } );
+
+
+ console.log("upload ok ")
 
   res.status(200).json({ message: "Files uploaded and embeddings stored successfully" });
     
