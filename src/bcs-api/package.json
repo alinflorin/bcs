@@ -16,7 +16,6 @@
     "@types/express-jwt": "^7.4.4",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.9.1",
-    "@types/pdfjs-dist": "^2.10.377",
     "@vercel/ncc": "^0.38.4",
     "dotenv": "^17.2.3",
     "tsx": "^4.20.6",
@@ -29,9 +28,9 @@
     "express": "^5.1.0",
     "express-jwt": "^8.5.1",
     "jwks-rsa": "^3.2.0",
-    "mammoth": "^1.11.0",
     "mongodb": "^6.20.0",
     "multer": "^2.0.2",
+    "pdfjs-dist": "^5.4.296",
     "yup": "^1.7.1"
   }
 }

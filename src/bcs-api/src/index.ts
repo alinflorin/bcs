@@ -18,7 +18,6 @@ import { extractTextFromPDF } from "./utils/pdfExtractor";
 import { getEmbedding } from "./services/geminiClient-service";
 import clientQdrant from "./services/qdrantdb-services";
 import isAdmin from "./middleware/is-admin-middleware";
-import mammoth from "mammoth";
 
 
 
@@ -473,9 +472,6 @@ app.post("/api/upload", isAdmin, upload.array("files"),  async (req, res) => {
   text = await extractTextFromPDF(file.buffer);
 } else if (file.mimetype.startsWith("text/")) {
   text = file.buffer.toString("utf8");
-} else if (file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-  const result = await mammoth.extractRawText({ buffer: file.buffer });
-  text = result.value; // extracted text
 } else {
   console.log("Unsupported file type:", file.mimetype);
   continue;
