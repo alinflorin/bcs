@@ -18,8 +18,62 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DescriptionIcon from "@mui/icons-material/Description";
+import { useState } from "react";
+import axios from "axios";
+import { useSnackbar } from "notistack";
 
 export default function Admin() {
+
+
+  const [name, setName]= useState("");
+  const [files, setFiles]= useState<File[]>([]);
+
+  const snackbar = useSnackbar();
+
+
+
+  const handleName = (event: React.ChangeEvent<HTMLInputElement>)=>{
+      setName(event.target.value)
+  
+  }
+
+
+  const handleFiileChnage = (event: React.ChangeEvent<HTMLInputElement>)=>{
+     if(event.target.files){
+      setFiles(Array.from(event.target.files))
+     }
+  }
+
+
+  const handleUpload = async ()=>{
+
+  const formData = new FormData();
+
+  files.forEach((file) => formData.append("files", file));
+
+try {
+    // Send POST request with Axios
+    const res = await axios.post(`/api/upload?name=${encodeURIComponent(name)}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    console.log(res.data)
+
+    // Clear form
+    setName("");
+    setFiles([]);
+  } catch (e: any) {
+   snackbar.enqueueSnackbar(e.response?.data?.message || "Error", { variant: "error" });
+
+  }
+
+    
+     
+  }
+
+
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
     clipPath: "inset(50%)",
@@ -83,6 +137,7 @@ export default function Admin() {
             label="Document Name"
             variant="outlined"
             placeholder="Enter document name"
+            onChange={handleName}
           />
 
           <Button
@@ -93,7 +148,7 @@ export default function Admin() {
             Upload Files
             <VisuallyHiddenInput
               type="file"
-              onChange={(event) => console.log(event.target.files)}
+              onChange={handleFiileChnage}
               multiple
             />
           </Button>
@@ -104,6 +159,7 @@ export default function Admin() {
           color="primary"
           endIcon={<SaveIcon />}
           sx={{ mt: 3 }}
+          onClick={handleUpload}
         >
           Send
         </Button>
