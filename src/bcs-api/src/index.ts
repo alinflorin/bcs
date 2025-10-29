@@ -15,14 +15,16 @@ import messageValidator from "./validators/message-validator";
 import { UpdateChat } from "./models/updateChat";
 import { randomBytes } from 'crypto';
 import multer from "multer";
-import geminiClient from "./services/geminiClient-service";
+import { extractTextFromPDF } from "./utils/pdfExtractor";
+import { getEmbedding } from "./services/geminiClient-service";
 import clientQdrant from "./services/qdrantdb-services";
 import isAdmin from "./middleware/is-admin-middleware";
 
+
+
+
 // DESEREALIZATOR because we recive the from data (bite) and this is transform in req.files 
 const upload = multer({ storage: multer.memoryStorage() });  // middleware 
-
-
 
 
 // ✂️ Split text into overlapping chunks
@@ -33,6 +35,8 @@ function splitText(text: string, chunkSize = 1000, overlap = 200): string[] {
   }
   return chunks;
 }
+
+
 
 const app = express();
 app.use(express.json());  ///  req.body 
@@ -440,9 +444,9 @@ app.patch('/api/update/:chatId', async (req, res) => {
 app.post("api/upload", isAdmin, upload.array("files"),  async (req, res) => {
 
 
-  const name = req.query.name
- 
-    const files = req.files as Express.Multer.File[];
+  const name = req.query.name as string;
+  const files = req.files as Express.Multer.File[];
+
     if (!files || files.length === 0) {
       return res.status(400).json({ message: "No files uploaded" });
     }
@@ -451,9 +455,42 @@ app.post("api/upload", isAdmin, upload.array("files"),  async (req, res) => {
 
     // 1️⃣ Extract text from each PDF   
 
+     for (const file of files) {
+      let text = "";
+
+      if (file.mimetype === "application/pdf") {
+        text = await extractTextFromPDF(file.buffer);
+      } else if (file.mimetype.startsWith("text/")) {
+        text = file.buffer.toString("utf8");
+      } else {
+        console.log("Unsupported file type:", file.mimetype);
+        continue;
+      }
+
+      const chunks = splitText(text);
+      allChunks.push(...chunks);
+    }
+
     // 2️⃣ Generate embeddings in batches (faster)
 
+    const embeddings: number[][] = [];
+  for (const chunk of allChunks) {
+    const vector = await getEmbedding(chunk);
+    embeddings.push(vector)
+  }
+   
+
     // 3️⃣ Upsert embeddings into Qdrant
+     const points = allChunks.map((chunk, idx) => ({
+    id: `${name}-${idx}`, // unique id
+    vector: embeddings[idx] as number[],
+    payload: { text: chunk, source: name },
+  }));
+
+ await clientQdrant.upsert(name, { points });
+
+  res.status(200).json({ message: "Files uploaded and embeddings stored successfully" });
+    
  
 });
 
