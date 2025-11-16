@@ -1,11 +1,7 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-const geminiClient = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
-
-// We create the embedding model once (reused for every call)
-const embeddingModel = geminiClient.getGenerativeModel({
-  model: "text-embedding-004",
+const geminiClient = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY!,
 });
 
 /**
@@ -15,8 +11,15 @@ const embeddingModel = geminiClient.getGenerativeModel({
  */
 export async function getEmbedding(text: string): Promise<number[]> {
   try {
-    const result = await embeddingModel.embedContent(text);
-    return result.embedding.values ?? [];
+    const rez = await geminiClient.models.embedContent({
+      model: "text-embedding-004",
+      contents: [
+        {
+          text: text,
+        },
+      ],
+    });
+    return rez.embeddings![0]!.values!;
   } catch (error) {
     console.error("❌ Error generating embedding:", error);
     return [];

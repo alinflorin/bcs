@@ -42,14 +42,11 @@ jobs:
           substitutionData: ${{ toJSON(secrets) }}
           throwOnDataMissing: false
 
-      - name: Setup Tailscale
-        uses: tailscale/github-action@v4
+      - name: Netbird connect
+        uses: Alemiz112/netbird-connect@v1.0.1
         with:
-          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TAILSCALE_CLIENT_SECRET }}
-          use-cache: "true"
-          tags: tag:mobile
-          version: latest
+          setup-key: ${{ secrets.NETBIRD_SETUP_KEY }}
+          management-url: ${{ secrets.NETBIRD_URL }}
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
