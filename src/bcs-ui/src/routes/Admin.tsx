@@ -33,7 +33,7 @@ export default function Admin() {
   const [document, setDocument]= useState<CollectionPdf[]>([]);
 
   const snackbar = useSnackbar();
-     const confirm = useConfirm();
+     const confirm = useConfirm()
 
 
 
