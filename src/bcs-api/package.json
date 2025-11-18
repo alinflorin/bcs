@@ -21,7 +21,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@google/genai": "^1.29.1",
+    "@google/genai": "^1.30.0",
     "@qdrant/js-client-rest": "^1.15.1",
     "express": "^5.1.0",
     "express-jwt": "^8.5.1",
