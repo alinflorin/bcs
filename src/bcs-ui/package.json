@@ -18,7 +18,7 @@
     "@mui/material": "^7.3.5",
     "axios": "^1.13.2",
     "notistack": "^3.0.2",
-    "oidc-client-ts": "^3.4.0",
+    "oidc-client-ts": "^3.4.1",
     "react": "^19.2.0",
     "react-bus": "^4.0.1",
     "react-dom": "^19.2.0",
