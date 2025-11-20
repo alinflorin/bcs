@@ -36,7 +36,7 @@ export default function ChatList() {
   const snackbar = useSnackbar();
   const [chat, setChat] = useState<Chat[]>([]);
 
-     const bus = useBus();
+   const bus = useBus();
    const confirm = useConfirm();
 
   // Menu state
@@ -51,6 +51,16 @@ export default function ChatList() {
   useListener("newChatCreated", (e) => {
     setChat((prev) => [e as Chat, ...prev]);
   });
+
+  useListener("chatDeleted", (id) => {
+      setChat((prev) => prev.filter((chat) => chat._id?.toString() !== id));
+  });
+
+    useListener("chatArchived", (id) => {
+      setChat((prev) => prev.filter((chat) => chat._id?.toString() !== id));
+  });
+
+    
 
 
 
@@ -207,6 +217,8 @@ const updateTitle = useCallback(
 
 
 
+
+
   return ( <>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -225,7 +237,8 @@ const updateTitle = useCallback(
                 </ListItemButton>
 
                 {/* Menu Button */}
-                <IconButton edge="end" aria-label="menu" onClick={(e) => handleClick1(e, c._id!)}>
+                <IconButton edge="end" aria-label="menu" onClick={(e) => handleClick1(e, c._id!)}
+                sx={{display:{xs: "none", md: "inline-flex"}}} >
                   <MoreHorizIcon />
                 </IconButton>
 

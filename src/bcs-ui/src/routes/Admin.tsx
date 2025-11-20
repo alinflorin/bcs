@@ -18,17 +18,22 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DescriptionIcon from "@mui/icons-material/Description";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useSnackbar } from "notistack";
+import { useConfirm } from "../hooks/useConfirmDialog";
+import { CollectionPdf } from "../models/collectionpdf";
+
 
 export default function Admin() {
 
 
   const [name, setName]= useState("");
   const [files, setFiles]= useState<File[]>([]);
+  const [document, setDocument]= useState<CollectionPdf[]>([]);
 
   const snackbar = useSnackbar();
+     const confirm = useConfirm();
 
 
 
@@ -37,13 +42,27 @@ export default function Admin() {
   
   }
 
-
   const handleFiileChnage = (event: React.ChangeEvent<HTMLInputElement>)=>{
      if(event.target.files){
       setFiles(Array.from(event.target.files))
      }
   }
 
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resposneDocuments = await axios.get("/api/collection");
+        setDocument(resposneDocuments.data);
+      } catch (e: any) {
+        snackbar.enqueueSnackbar(e.response?.data?.message || "Error", {
+          variant: "error",
+        });
+      }
+    })();
+  }, []);
+
+  
 
   const handleUpload = async ()=>{
 
@@ -68,10 +87,22 @@ try {
    snackbar.enqueueSnackbar(e.response?.data?.message || "Error", { variant: "error" });
 
   }
-
-    
      
   }
+
+  const deleteDocument = useCallback(
+    async (id: string) => {
+      try {
+        await axios.delete("/api/collection/" + id);
+        setDocument((prev) => prev.filter((chat) => chat.id?.toString() !== id));
+      
+       
+      } catch (e: any) {
+        snackbar.enqueueSnackbar(e.response?.data?.message || "Error", { variant: "error" });
+      }
+    },
+    [snackbar]
+  );
 
 
   const VisuallyHiddenInput = styled("input")({
@@ -86,11 +117,6 @@ try {
     width: 1,
   });
 
-  const uploadedDocs = [
-    { id: 1, name: "Project_Plan.pdf" },
-    { id: 2, name: "Budget_Report.xlsx" },
-    { id: 3, name: "Meeting_Notes.docx" },
-  ];
 
   return (
     <Box
@@ -178,13 +204,13 @@ try {
           Uploaded Files
         </Typography>
 
-        {uploadedDocs.length === 0 ? (
+        {document.length === 0 ? (
           <Typography color="text.secondary">
             No documents uploaded yet.
           </Typography>
         ) : (
           <List>
-            {uploadedDocs.map((doc) => (
+            {document.map((doc) => (
               <ListItem
                 key={doc.id}
                 sx={{
@@ -206,7 +232,15 @@ try {
                   <ListItemText primary={doc.name} />
                 </Box>
 
-                <IconButton color="error">
+                <IconButton   onClick={async (e) => {
+                      e.stopPropagation();
+                      const ok = await confirm({
+                        title: "Delete this item?",
+                        message: "This action cannot be undone. This chat will be deleted permanently.",
+                      });
+                      if (ok) {
+                       await deleteDocument(doc.id!)}
+                      }} color="error">   
                   <DeleteIcon />
                 </IconButton>
               </ListItem>

@@ -19,7 +19,11 @@ import { getEmbedding } from "./services/geminiClient-service";
 import clientQdrant from "./services/qdrantdb-services";
 import isAdmin from "./middleware/is-admin-middleware";
 import mammoth from "mammoth";
+import {GoogleGenAI} from '@google/genai';
+import { title } from "process";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
+const ai = new GoogleGenAI({apiKey: GEMINI_API_KEY});
 
 
 // DESEREALIZATOR because we recive the from data (bite) and this is transform in req.files 
@@ -327,7 +331,7 @@ if( chat.userEmail !== req.auth!["https://bcs-api/email"] ){
   return
 }
 
-
+// save the user massage
 const entuity: MessageEntity = {
   chatId: message.chatId,
   date: message.date,
@@ -339,14 +343,43 @@ const entuity: MessageEntity = {
 
 await mongoDbDatabase.collection<MessageEntity>('messages').insertOne(entuity)
 
+
+
+
+
+
+
+const messageContents = `You are the  AI assistant. 
+             Respond normally to this question: ${message.text}.`  
+ 
 //AI
 
-const aiMessage: Message = {
+ const resposneAI = await ai.models.generateContent({
+    model: 'gemini-2.0-flash',
+    contents: messageContents,
+    config: {
+      //add config
+    }
+  
+})
+
+const aiText = resposneAI.text?.toString() || "I'm here to help."; 
+
+
+//save ai text 
+
+const aiMessage: MessageEntity = {
   chatId: message.chatId,
-  text: 'This is from AI',
+  text: aiText,
   date: new Date().getTime(),
   isFromAi: true
 };
+
+//save ai message 
+
+  await mongoDbDatabase.collection<MessageEntity>('messages').insertOne(aiMessage);
+
+
 res.send(aiMessage)
 
 
@@ -527,6 +560,52 @@ app.post("/api/upload", isAdmin, upload.array("files"),  async (req, res) => {
     
  
 });
+
+
+
+// Get all documents stored in Qdrant
+app.get("/api/collection", isAdmin, async (req, res) => {
+  try {
+    // 1️ List all collections
+    const collections = await clientQdrant.getCollections();
+
+    const result: any[] = [];
+
+    // 2 For each collection, read its points
+    for (const col of collections.collections) {
+      const name = col.name;
+
+    
+
+      result.push({
+        collectionName: name,
+      });
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch documents." });
+  }
+});
+
+
+// delete documents 
+
+app.delete("/api/collection/:id", isAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await clientQdrant.deleteCollection(id!);
+    res.json({ message: `Collection '${id}' deleted.` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to delete collection." });
+  }
+});
+
+
+
 
 
 

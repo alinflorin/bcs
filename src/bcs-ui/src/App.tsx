@@ -6,7 +6,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+import MenuIcon from '@mui/icons-material/Menu';
 import Sidebar from "./components/Sidebar";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { useAuth } from "react-oidc-context";
@@ -37,7 +37,7 @@ export default function App() {
         display: "flex",
         height: "100vh",
         width: "100%",
-        overflow: "hidden",
+        overflow: "auto",  //hidden
       }}
     >
       <Sidebar
