@@ -37,7 +37,7 @@ export default function App() {
         display: "flex",
         height: "100vh",
         width: "100%",
-        overflow: "hidden",
+        overflow: "auto",  //hidden
       }}
     >
       <Sidebar
