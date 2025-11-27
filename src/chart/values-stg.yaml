@@ -1,7 +1,7 @@
 environment: stg
 arch: arm64
 ingress:
-  domain: bcs-stg.svc.fsociety
+  domain: bcs-stg.svc.fs0cy.private
 
 secrets:
   qdrantReadWriteApiKey: '${QDRANT_READ_WRITE_API_KEY}'

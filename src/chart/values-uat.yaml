@@ -1,7 +1,7 @@
 environment: uat
 arch: arm64
 ingress:
-  domain: bcs-uat.svc.fsociety
+  domain: bcs-uat.svc.fs0cy.private
 
 secrets:
   qdrantReadWriteApiKey: '${QDRANT_READ_WRITE_API_KEY}'

@@ -1,7 +1,7 @@
 environment: prd
 arch: arm64
 ingress:
-  domain: bcs.svc.fsociety
+  domain: bcs.svc.fs0cy.private
 
 
 secrets:
