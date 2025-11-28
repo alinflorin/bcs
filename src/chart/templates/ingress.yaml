@@ -16,7 +16,7 @@ metadata:
     {{- end }}
 
 spec:
-  ingressClassName: nginx-private
+  ingressClassName: traefik
   tls:
     - hosts:
         - {{ .Values.ingress.domain }}
