@@ -10,23 +10,11 @@ oidc:
   scopes: 'openid profile email offline_access api:use'
 
 ui:
-  resources:
-    requests:
-      memory: "128Mi"
-      cpu: "250m"
-    limits:
-      memory: "1Gi"
-      cpu: "1000m"
+  resources: {}
 
 
 api:
-  resources:
-    requests:
-      memory: "512Mi"
-      cpu: "500m"
-    limits:
-      memory: "2Gi"
-      cpu: "1000m"
+  resources: {}
 
 ingress:
   domain: null
@@ -46,13 +34,7 @@ qdrant:
         enable_tls: false
       consensus:
         tick_period_ms: 100
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-    requests:
-      cpu: 100m
-      memory: 256Mi
+  resources: {}
   persistence:
     size: 5Gi
   apiKey:
@@ -70,13 +52,7 @@ mongodb:
   enabled: true
   port: '27017'
   username: bcs
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-    requests:
-      cpu: 100m
-      memory: 256Mi
+  resources: {}
   storage:
     volumeName: "mongodb-volume"
     requestedSize: 5Gi
