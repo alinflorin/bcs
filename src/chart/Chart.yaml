@@ -28,5 +28,5 @@ dependencies:
     version: 1.16.2
     repository: "https://qdrant.github.io/qdrant-helm"
   - name: mongodb
-    version: "0.7.5"
+    version: 0.7.7
     repository: "https://groundhog2k.github.io/helm-charts/"
