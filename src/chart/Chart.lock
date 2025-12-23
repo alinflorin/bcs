@@ -1,9 +1,9 @@
 dependencies:
 - name: qdrant
   repository: https://qdrant.github.io/qdrant-helm
-  version: 1.16.2
+  version: 1.16.3
 - name: mongodb
   repository: https://groundhog2k.github.io/helm-charts/
   version: 0.7.5
-digest: sha256:965cb98d77a8525bc2567e5be0a664e7aa5e213032a4a1c1b2f2223ce3e8327e
-generated: "2025-12-15T12:36:43.587615+02:00"
+digest: sha256:450566e078d147bd0bdb7eecbae9357572214c8f7c6ac39c5766140501306213
+generated: "2025-12-23T07:21:29.756964115Z"
