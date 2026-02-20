@@ -16,14 +16,14 @@
     "@fontsource/roboto": "^5.2.9",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
-    "axios": "^1.13.2",
+    "axios": "^1.13.5",
     "notistack": "^3.0.2",
     "oidc-client-ts": "^3.4.1",
     "react": "^19.2.3",
     "react-bus": "^4.0.1",
     "react-dom": "^19.2.3",
     "react-oidc-context": "^3.3.0",
-    "react-router": "^7.10.1"
+    "react-router": "^7.12.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
